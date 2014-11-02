@@ -1,0 +1,4 @@
+*** Receiptful for WooCommerce ***
+
+2014-11-01  Version 1.0.0
+* Initial Release
