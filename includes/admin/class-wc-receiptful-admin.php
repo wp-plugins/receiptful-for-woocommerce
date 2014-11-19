@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * @class       WC_Receiptful_Admin
  * @version     1.0.0
- * @author      Grow Development
+ * @author      Receiptful
  */
 class WC_Receiptful_Admin {
 
@@ -16,19 +16,19 @@ class WC_Receiptful_Admin {
 	 * URL for the store owner's Profile page in the Receiptful app.
 	 * @var string
 	 */
-	private $receiptful_profile_url = 'https://app.receiptful.com/profile';
+	public $receiptful_profile_url = 'https://app.receiptful.com/profile';
 
 	/**
 	 * URL for the store owner's Template in the Receiptful app.
 	 * @var string
 	 */
-	private $receiptful_template_url = 'https://app.receiptful.com/template';
+	public $receiptful_template_url = 'https://app.receiptful.com/template';
 
 	/**
-	 * URL for the store owner's Dasboard in the Receiptful app.
+	 * URL for the store owner's Dashboard in the Receiptful app.
 	 * @var string
 	 */
-	private $receiptful_stats_url = 'https://app.receiptful.com/dashboard';
+	public $receiptful_stats_url = 'https://app.receiptful.com/dashboard';
 
 
 	/**
@@ -59,7 +59,7 @@ class WC_Receiptful_Admin {
 		// Save settings page
 		add_action( 'woocommerce_update_options_receiptful', array( $this, 'update_options' ) );
 
-		}
+	}
 
 
 	/**

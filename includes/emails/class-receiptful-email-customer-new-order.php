@@ -1,5 +1,4 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
@@ -17,6 +16,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 	 */
 	class Receiptful_Email_Customer_New_Order extends WC_Email {
 
+
 		/**
 		 * Constructor
 		 */
@@ -29,9 +29,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 			// Triggers for this email
 			add_action( 'receiptful_order_status_processing_notification', array( $this, 'trigger' ) );
 
-			// Call parent constuctor
+			// Call parent constructor
 			parent::__construct();
 		}
+
 
 		/**
 		 * trigger function.
@@ -141,15 +142,34 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 				}
 
+				// Register the usage of Receiptful coupons
+				foreach ( $order->get_used_coupons() as $coupon ) {
+
+					$coupon_id 					= Receiptful()->get_coupon_by_code( $coupon );
+					$coupon_order_id			= get_post_meta( $coupon_id, 'receiptful_coupon_order', true );
+					$previous_order_receipt_id	= get_post_meta( $coupon_order_id, '_receiptful_receipt_id', true );
+					$is_receiptful_coupon 		= get_post_meta( $coupon_id, 'receiptful_coupon', true );
+
+					if ( 'yes' == $is_receiptful_coupon && $previous_order_receipt_id ) {
+
+						$coupon_args = array(
+							'reference'	=> $previous_order_receipt_id,
+							'amount'	=> number_format( (float) $order->get_total(), 2, '.', '' ) ,
+						);
+						$response = Receiptful()->api->coupon_used( strtoupper( $coupon ), $coupon_args );
+
+					}
+
+				}
+
 
 				// These values are added to the order at checkout if available.
-				// If not recorded then emtpy string will be sent.
+				// If not recorded then empty string will be sent.
 				$card_type      = isset( $order->receiptful_card_type ) ? $order->receiptful_card_type : '' ;
 				$last4          = isset( $order->receiptful_last4 ) ? $order->receiptful_last4 : '';
 				$customer_ip    = isset( $order->receitpful_customer_ip ) ? $order->receitpful_customer_ip : '';
 
 				$order_args = array(
-
 					'reference'  => ltrim( $order->get_order_number(), _x( '#', 'hash before order number', 'woocommerce' ) ),
 					'currency'   => get_woocommerce_currency(),
 					'amount'     => number_format((float) $order->get_total(), 2, '.', '') ,
@@ -192,40 +212,40 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 				$response = Receiptful()->api->receipt( $order_args );
 
-				if ( is_wp_error($response)) {
+				if ( is_wp_error( $response ) ) {
 					// queue the message for sending via cron
 					$resend_queue = get_option( '_receiptful_resend_queue' );
 					$resend_queue[] = $order->id;
-					update_option( '_receiptful_resend_queue', $resend_queue);
+					update_option( '_receiptful_resend_queue', $resend_queue );
 
 				} elseif ( $response['response']['code'] == '201' ) {
 
-					$order->add_order_note('Customer receipt sent via Receiptful.');
+					$order->add_order_note( 'Customer receipt sent via Receiptful.' );
 					$body = json_decode( $response ['body'], true);
 
-					add_post_meta( $order_id, '_receiptful_web_link', $body['_meta']['links']);
+					add_post_meta( $order_id, '_receiptful_web_link', $body['_meta']['links'] );
 					add_post_meta( $order_id, '_receiptful_receipt_id', $body['_id'] );
 
 					$upsell = $body['upsell'];
-					if ( isset( $upsell['couponCode']) ) {
-						do_action( 'receiptful_add_upsell', $upsell );
+					if ( isset( $upsell['couponCode'] ) ) {
+						do_action( 'receiptful_add_upsell', $upsell, $order->id );
 					}
 
 				} else {
-					$order->add_order_note('Error sending customer receipt sent via Receiptful.'
+					$order->add_order_note( 'Error sending customer receipt sent via Receiptful.'
 											. "\n" . "Error Code: " . $response['response']['code']
-											. "\n" . "Error Message: " . $response['response']['message']);
+											. "\n" . "Error Message: " . $response['response']['message'] );
 
 					// queue the message for sending via cron
 					$resend_queue = get_option( '_receiptful_resend_queue' );
 					$resend_queue[] = $order_id;
-					update_option( '_receiptful_resend_queue', $resend_queue);
+					update_option( '_receiptful_resend_queue', $resend_queue );
 				}
-
 
 			}
 
 		}
+
 
 		/**
 		 * Initialise Settings Form Fields
@@ -234,6 +254,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 		 * @return void
 		 */
 		function init_form_fields() {
+
 			$this->form_fields = array(
 				'enabled' => array(
 					'title' 		=> __( 'Enable/Disable', 'woocommerce' ),
@@ -242,8 +263,12 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 					'default' 		=> 'yes'
 				),
 			);
+
 		}
+
+
 	}
+
 
 endif;
 

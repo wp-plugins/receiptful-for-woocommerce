@@ -36,11 +36,26 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Screenshots ==
 
-1. None yet
+1. WordPress / WooCommerce Plugin Settings. Just add API key.
+2. Receiptful's dashboard and mission control center.
+3. Customizing your Receiptful template.
+4. Add & activating upsells to be included in your receipts.
+5. Example of customer profile overview with rich meta data.
+
 
 == Changelog ==
 
-= 1.0 =
+= 1.0.1 = 19/11/2014
+* [Add] - Plugin screenshots + banner + icon
+* [Add] - Coupon usage tracking
+* [Add] - Option to restrict coupon usage to customer email
+* [Add] - WooCommerce 2.1.X support
+* [Improvement] - Change CRON from 60 to 15 minutes
+* [Improvement] - WooCommerce activated check for both network activated and single site
+* [Fix] - Notice when using Free shippping upsell
+* [Fix] - Incorrect coupon expiry date
+
+= 1.0.0 = 22/10/2014
 * Initial Release
 
 

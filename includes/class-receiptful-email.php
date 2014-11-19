@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * @class       Receiptful_Email
  * @version     1.0.0
- * @author      Grow Development
+ * @author      Receiptful
  */
 class Receiptful_Email {
 
@@ -51,7 +51,7 @@ class Receiptful_Email {
 		add_action( 'woocommerce_api_check_authentication', array( $this, 'authenticate' ), 90 );
 
 		// Add coupon if the Receiptful API returns an upsell
-		add_action( 'receiptful_add_upsell', array($this, 'create_coupon') );
+		add_action( 'receiptful_add_upsell', array($this, 'create_coupon'), 10, 2 );
 
 		// Add 'View Receipt' button to the My Account page
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'view_receipt_button' ), 9, 2 );
@@ -115,7 +115,7 @@ class Receiptful_Email {
 	 * Save Card Data
 	 *
 	 */
-	public function save_card_data( $order_id, $posted ){
+	public function save_card_data( $order_id, $posted ) {
 
 		// TODO: try a different route
 		// most gateways don't collect card type, but the number
@@ -149,7 +149,7 @@ class Receiptful_Email {
 	 *
 	 *
 	 */
-	public function load_api_endpoints(){
+	public function load_api_endpoints() {
 
 		include_once( 'api/class-receiptful-api-products.php' );
 
@@ -178,10 +178,14 @@ class Receiptful_Email {
 	 * @param array $data
 	 * @return void
 	 */
-	public function create_coupon( $data ) {
+	public function create_coupon( $data, $order_id ) {
+
 		global $wpdb;
 
-		$coupon_code = apply_filters( 'woocommerce_coupon_code', wc_clean( $data['couponCode'] ) );
+		$order				= wc_get_order( $order_id );
+		$coupon_code		= apply_filters( 'woocommerce_coupon_code', wc_clean( $data['couponCode'] ) );
+		$shipping_coupon 	= 'no';
+		$discount_type 		= 'fixed_cart';
 
 		// Check for duplicate coupon codes
 		$coupon_found = $wpdb->get_var( $wpdb->prepare( "
@@ -198,22 +202,31 @@ class Receiptful_Email {
 			return;
 		}
 
-		$expiry_date = date_i18n('c', strtotime( '+' . wc_clean( $data['expiryPeriod'] ) . ' day' ) );
+		$expiry_date = date_i18n( 'Y-m-d', strtotime( '+' . wc_clean( $data['expiryPeriod'] ) . ' day' ) );
 
-		switch ( wc_clean( $data['couponType'] ) ) {
-			case 1:
-				$discount_type = 'fixed_cart';
-				break;
-			case 2:
-				$discount_type = 'percent';
-				break;
-			default:
-				$discount_type = 'fixed_cart';
+		if ( 'discountcoupon' == $data['upsellType'] ) {
+
+			switch ( wc_clean( $data['couponType'] ) ) {
+				case 1:
+					$discount_type = 'fixed_cart';
+					break;
+				case 2:
+					$discount_type = 'percent';
+					break;
+
+				default:
+					$discount_type = 'fixed_cart';
+			}
+
+		} elseif( 'shippingcoupon' == $data['upsellType'] ) {
+
+			$shipping_coupon = 'yes';
+
 		}
 
 		$coupon_data = array(
 			'type'                       => $discount_type,
-			'amount'                     => wc_clean ( $data['amount'] ),
+			'amount'                     => isset( $data['amount'] ) ? wc_clean ( $data['amount'] ) : '',
 			'individual_use'             => 'yes',
 			'product_ids'                => $data['products'],
 			'exclude_product_ids'        => array(),
@@ -223,14 +236,13 @@ class Receiptful_Email {
 			'usage_count'                => '',
 			'expiry_date'                => $expiry_date,
 			'apply_before_tax'           => 'yes',
-			'free_shipping'              => 'no',
+			'free_shipping'              => $shipping_coupon,
 			'product_categories'         => array(),
 			'exclude_product_categories' => array(),
 			'exclude_sale_items'         => 'no',
 			'minimum_amount'             => '',
 			'maximum_amount'             => '',
-			'customer_email'             => array(),
-			''
+			'customer_email'             => ! empty( $data['emailLimit'] ) ? array( $order->billing_email ) : array(),
 		);
 
 		$new_coupon = array(
@@ -268,6 +280,8 @@ class Receiptful_Email {
 		update_post_meta( $id, 'minimum_amount', wc_format_decimal( $coupon_data['minimum_amount'] ) );
 		update_post_meta( $id, 'maximum_amount', wc_format_decimal( $coupon_data['maximum_amount'] ) );
 		update_post_meta( $id, 'customer_email', array_filter( array_map( 'sanitize_email', $coupon_data['customer_email'] ) ) );
+		update_post_meta( $id, 'receiptful_coupon', 'yes' );
+		update_post_meta( $id, 'receiptful_coupon_order', $order_id );
 
 		return;
 
@@ -326,6 +340,7 @@ class Receiptful_Email {
 
 	}
 
+
 	/**
 	 * Display the Receiptful action in the Order Actions meta box drop down.
 	 *
@@ -336,10 +351,12 @@ class Receiptful_Email {
 	function receiptful_order_actions( $actions ) {
 
 		if ( is_array( $actions ) ) {
-			$actions['receiptful_send_receipt'] = __('Send receipt', 'receiptful');
+			$actions['receiptful_send_receipt'] = __( 'Send receipt', 'receiptful' );
 		}
 
 		return $actions;
+
 	}
+
 
 }
