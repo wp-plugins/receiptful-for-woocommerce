@@ -15,9 +15,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
  *	Class Receiptful_WooCommerce
@@ -30,17 +28,37 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Receiptful_WooCommerce {
 
+
+	/**
+	 * Plugin version.
+	 *
+	 * @since 1.0.1
+	 * @var string $version Plugin version number.
+	 */
+	public $version = '1.0.1';
+
+
+	/**
+	 * Plugin file.
+	 *
+	 * @since 1.0.0
+	 * @var string $file Plugin file path.
+	 */
+	public $file = __FILE__;
+
+
 	/**
 	 * Instance of Receiptful_WooCommerce.
 	 *
 	 * @since 1.0.0
-	 * @access private
+	 * @access protected
 	 * @var object $instance The instance of Receiptful_WooCommerce.
 	 */
-	private static $instance;
+	protected static $instance;
+
 
 	/**
-	 * Construct.
+	 * Constructor.
 	 *
 	 * Initialize the class and plugin.
 	 *
@@ -48,7 +66,21 @@ class Receiptful_WooCommerce {
 	 */
 	public function __construct() {
 
+		// Check if WooCommerce is active
+		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+		}
+
+		if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+			if ( ! is_plugin_active_for_network( 'woocommerce/woocommerce.php' ) ) {
+				return;
+			}
+		}
+
+		// Initialize plugin parts
 		$this->init();
+
+		do_action( 'receiptful_loaded' );
 
 	}
 
@@ -60,7 +92,8 @@ class Receiptful_WooCommerce {
 	 * to use on other files/plugins/themes.
 	 *
 	 * @since 1.0.0
-	 * @return object Instance of the class.
+	 *
+	 * @return Receiptful_WooCommerce Instance of the class.
 	 */
 	public static function instance() {
 
@@ -72,6 +105,7 @@ class Receiptful_WooCommerce {
 
 	}
 
+
 	/**
 	 * init.
 	 *
@@ -81,7 +115,7 @@ class Receiptful_WooCommerce {
 	 */
 	public function init() {
 
-		if ( is_admin() ) :
+		if ( is_admin() ) {
 
 			/**
 			 * Admin settings class
@@ -89,7 +123,7 @@ class Receiptful_WooCommerce {
 			require_once 'includes/admin/class-wc-receiptful-admin.php';
 			$this->admin = new WC_Receiptful_Admin();
 
-		endif;
+		}
 
 		/**
 		 * Main Receiptful class
@@ -114,26 +148,34 @@ class Receiptful_WooCommerce {
 
 
 	/**
-	 * Saves the version of the plugin to the database and displays an activation notice on where users
-	 * can access the new options.
+	 * Plugin activation.
+	 *
+	 * Saves the version of the plugin to the database and displays an
+	 * activation notice on where users can access the new options.
+	 *
+	 * @since 1.0.0
 	 */
 	public function plugin_activation() {
 
-		if( RECEIPTFUL_WOOCOMMERCE != get_option( 'receiptful_woocommerce_version' ) ) {
+		$api_key = get_option( 'receiptful_api_key' );
+		if ( empty( $api_key ) ) {
 
-			add_option( 'receiptful_woocommerce_version', RECEIPTFUL_WOOCOMMERCE );
+			add_option( 'receiptful_woocommerce_version', $this->version );
 
-			$html = '<div class="updated">';
-			$html .= '<p>';
-			$html .= __( 'Receiptful has been activated. Please click <a href="admin.php?page=wc-settings&tab=receiptful">here</a> to add your API key & supercharge your receipts.', 'receiptful' );
-			$html .= '</p>';
-			$html .= '</div><!-- /.updated -->';
+			?><div class="updated">
+				<p><?php
+					_e( 'Receiptful has been activated. Please click <a href="admin.php?page=wc-settings&tab=receiptful">here</a> to add your API key & supercharge your receipts.', 'receiptful' );
+				?></p>
+			</div><!-- /.updated --><?php
 
-			echo $html;
+		}
 
-		} // end if
+		// Update version number if its not the same
+		if ( $this->version != get_option( 'receiptful_woocommerce_version' ) ) {
+			update_option( 'receiptful_woocommerce_version', $this->version );
+		}
 
-	} // end plugin_activation
+	}
 
 
 	/**
@@ -144,64 +186,82 @@ class Receiptful_WooCommerce {
 	 */
 	function receiptful_plugin_links( $links ) {
 
-		$plugin_links = array(
-			'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=receiptful' ) . '">' . __( 'Settings', 'receiptful' ) . '</a>',
-		);
+		$links[] = '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=receiptful' ) . '">' . __( 'Settings', 'receiptful' ) . '</a>';
 
-		return array_merge( $plugin_links, $links );
+		return $links;
+
 	}
 
 
+	/**
+	 * Coupon by code.
+	 *
+	 * Get the coupon ID by the coupon code.
+	 *
+	 * @param 	string $coupon_code Code that is used as coupon code.
+	 * @return
+	 */
+	public function get_coupon_by_code( $coupon_code ) {
+
+		global $wpdb;
+
+		$coupon_id = $wpdb->get_var( $wpdb->prepare( apply_filters( 'woocommerce_coupon_code_query', "
+			SELECT ID
+			FROM $wpdb->posts
+			WHERE post_title = %s
+			AND post_type = 'shop_coupon'
+			AND post_status = 'publish'
+		" ), $coupon_code ) );
+
+		 if ( ! $coupon_id ) {
+		 	return false;
+		 } else {
+		 	return $coupon_id;
+		 }
+
+	}
 
 
 }
 
-if ( ! function_exists( 'Receiptful_Init' ) ) :
 
-	// Set the version of this plugin
-	if( ! defined( 'RECEIPTFUL_WOOCOMMERCE' ) ) {
-	  define( 'RECEIPTFUL_WOOCOMMERCE', '1.0' );
-	} // end if
+/**
+ * Receiptful CRON events
+ */
+require_once plugin_dir_path( __FILE__ ) . '/includes/functions-receiptful-cron.php';
 
+
+/**
+ *  After plugins are loaded check compatibility based on existence of WooCommerce functions
+ */
+add_action( 'plugins_loaded', 'receiptful_compatibility_check' );
+
+function receiptful_compatibility_check() {
 	/**
-	 * The main function responsible for returning the Receiptful_WooCommerce object.
-	 *
-	 * Use this function like you would a global variable, except without needing to declare the global.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return object Receiptful_WooCommerce class object.
+	 * Receiptful compatibility functions
 	 */
+	require_once plugin_dir_path( __FILE__ ) . '/includes/functions-receiptful-compatibility.php';
 
-	/**
-	 * WC Detection
-	 */
-	if ( ! function_exists( 'is_woocommerce_active' ) ) {
-		function is_woocommerce_active() {
-			$active_plugins = (array) get_option( 'active_plugins', array() );
-
-			return in_array( 'woocommerce/woocommerce.php', $active_plugins ) || array_key_exists( 'woocommerce/woocommerce.php', $active_plugins );
-		}
-	}
-
-	if ( is_woocommerce_active() ) {
-		function Receiptful_Init() {
-			return Receiptful_WooCommerce::instance();
-		}
-
-		Receiptful_Init();
-
-		/**
-		 * Receiptful CRON events
-		 */
-		require_once plugin_dir_path( __FILE__ ) . '/includes/functions-receiptful-cron.php';
-
-	}
-endif;
-
-
-function Receiptful() {
-	return Receiptful_WooCommerce::instance();
 }
 
 
+/**
+ * The main function responsible for returning the Receiptful_WooCommerce object.
+ *
+ * Use this function like you would a global variable, except without needing to declare the global.
+ *
+ * Example: <?php Receiptful()->method_name(); ?>
+ *
+ * @since 1.0.0
+ *
+ * @return object Receiptful_WooCommerce class object.
+ */
+if ( ! function_exists( 'Receiptful' ) ) {
+
+ 	function Receiptful() {
+		return Receiptful_WooCommerce::instance();
+	}
+
+}
+
+Receiptful();

@@ -6,17 +6,15 @@
  * @category    API
  * @package     Receiptful/API
  * @since       1.0.0
- *
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
-}
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class Receiptful_API_Products extends WC_API_Resource {
 
 	/** @var string $base the route base */
 	protected $base = '/receiptful-products';
+
 
 	/**
 	 * Register the routes for this class
@@ -36,6 +34,7 @@ class Receiptful_API_Products extends WC_API_Resource {
 
 		return $routes;
 	}
+
 
 	/**
 	 * Return Suggested Products based on supplied product ID
@@ -58,16 +57,16 @@ class Receiptful_API_Products extends WC_API_Resource {
 		$related_ids = $product->get_related( 2 );
 
 		$related_products = array();
-		foreach ( $related_ids as $related_id ){
+		foreach ( $related_ids as $related_id ) {
 
 			$related_product = wc_get_product( $related_id );
 
 			$new_related = array(
-				'title' 	=> $related_product->get_title(),					// Product Name
-				'url' => get_permalink( $related_product->id ),				// Product URL
-				'image' => $this->get_image_url( $related_product->id ),	// Image URL
-				'description' => $related_product->post->post_content,		// Description
-				'price' => $related_product->get_price(),					// Price
+				'title' 		=> $related_product->get_title(),					// Product Name
+				'url' 			=> get_permalink( $related_product->id ),				// Product URL
+				'image' 		=> $this->get_image_url( $related_product->id ),	// Image URL
+				'description' 	=> $related_product->post->post_content,		// Description
+				'price' 		=> $related_product->get_price(),					// Price
 			);
 
 			$related_products[] = $new_related;
@@ -75,7 +74,6 @@ class Receiptful_API_Products extends WC_API_Resource {
 		}
 
 		return array( 'products' => $related_products );
-
 
 	}
 
@@ -97,8 +95,9 @@ class Receiptful_API_Products extends WC_API_Resource {
 		$id = absint( $id );
 
 		// validate ID
-		if ( empty( $id ) )
+		if ( empty( $id ) ) {
 			return new WP_Error( "woocommerce_api_invalid_{$resource_name}_id", sprintf( __( 'Invalid %s ID', 'woocommerce' ), 'product' ), array( 'status' => 404 ) );
+		}
 
 		// only custom post types have per-post type/permission checks
 		$post = get_post( $id );
@@ -107,8 +106,9 @@ class Receiptful_API_Products extends WC_API_Resource {
 		$post_type = ( 'product_variation' === $post->post_type ) ? 'product' : $post->post_type;
 
 		// validate post type
-		if ( 'product' !== $post_type )
+		if ( 'product' !== $post_type ) {
 			return new WP_Error( "woocommerce_api_invalid_{$resource_name}", sprintf( __( 'Invalid %s', 'woocommerce' ), $resource_name ), array( 'status' => 404 ) );
+		}
 
 
 		return $id;
@@ -125,7 +125,7 @@ class Receiptful_API_Products extends WC_API_Resource {
 	 */
 	protected function get_image_url( $id ) {
 
-		$image	= '';
+		$image = '';
 
 		if ( has_post_thumbnail( $id ) ) {
 
