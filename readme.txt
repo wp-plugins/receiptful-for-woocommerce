@@ -46,6 +46,7 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 == Changelog ==
 
 = 1.0.1 = 19/11/2014
+
 * [Add] - Plugin screenshots + banner + icon
 * [Add] - Coupon usage tracking
 * [Add] - Option to restrict coupon usage to customer email
@@ -56,6 +57,7 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 * [Fix] - Incorrect coupon expiry date
 
 = 1.0.0 = 22/10/2014
+
 * Initial Release
 
 
