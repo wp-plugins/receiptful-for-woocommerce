@@ -1,4 +1,23 @@
 *** Receiptful for WooCommerce ***
 
+2014-12-04  Version 1.0.2
+* [Add] - Added reporting for email conversions
+* [Improvement] - Refactor the API class
+* [Improvement] - Refactor related products code
+* [Improvement] - Add more code commenting
+* [Improvement] - Remove custom API endpoint for coupons
+* [Fix] - WC Pending email sending
+* [Fix] - Email being sent for digital downloads
+
+2014-11-19  Version 1.0.1
+* [Add] - Plugin screens shots + banner + icon
+* [Add] - Coupon usage tracking
+* [Add] - Option to restrict coupon usage to customer email
+* [Add] - WooCommerce 2.1.X support
+* [Improvement] - Change CRON from 60 to 15 minutes
+* [Improvement] - WooCommerce activated check for both network activated and single site
+* [Fix] - Notice when using Free shipping upsell
+* [Fix] - Incorrect coupon expiry date
+
 2014-11-01  Version 1.0.0
 * Initial Release

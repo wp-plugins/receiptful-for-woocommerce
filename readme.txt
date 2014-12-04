@@ -2,8 +2,8 @@
 Contributors: receiptful
 Tags: woocommerce, receiptful, ecommerce, email
 Requires at least: 3.0.1
-Tested up to: 4.0
-Stable tag: 1.0.1
+Tested up to: 4.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,19 +45,26 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Changelog ==
 
-= 1.0.1 = 19/11/2014
+= 1.0.2 = 03/12/2014
+* [Add] - Added reporting for email conversions
+* [Improvement] - Refactor the API class
+* [Improvement] - Refactor related products code
+* [Improvement] - Add more code commenting
+* [Improvement] - Remove custom API endpoint for coupons
+* [Fix] - WC Pending email sending
+* [Fix] - Email being sent for digital downloads
 
-* [Add] - Plugin screenshots + banner + icon
+= 1.0.1 = 19/11/2014
+* [Add] - Plugin screen shots + banner + icon
 * [Add] - Coupon usage tracking
 * [Add] - Option to restrict coupon usage to customer email
 * [Add] - WooCommerce 2.1.X support
 * [Improvement] - Change CRON from 60 to 15 minutes
 * [Improvement] - WooCommerce activated check for both network activated and single site
-* [Fix] - Notice when using Free shippping upsell
+* [Fix] - Notice when using Free shipping upsell
 * [Fix] - Incorrect coupon expiry date
 
 = 1.0.0 = 22/10/2014
-
 * Initial Release
 
 

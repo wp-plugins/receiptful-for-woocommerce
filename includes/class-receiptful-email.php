@@ -39,16 +39,10 @@ class Receiptful_Email {
 		//add_action( 'woocommerce_order_status_completed', array( $this, 'send_transactional_email' ) );
 		add_action( 'woocommerce_order_status_pending_to_processing', array( $this, 'send_transactional_email' ) );
 		add_action( 'woocommerce_order_status_on-hold_to_processing', array( $this, 'send_transactional_email' ) );
+		add_action( 'woocommerce_order_status_pending_to_completed', array( $this, 'send_transactional_email' ) );
 
 		// Save card last 4, card type and customer IP for sending with receipt
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_card_data' ), 90, 2 );
-
-		// Add API endpoints
-		add_action( 'woocommerce_api_loaded', array( $this, 'load_api_endpoints' ) );
-		add_action( 'woocommerce_api_classes', array( $this, 'add_api_classes' ) );
-
-		// Bypass API Authentication for custom endpoints
-		add_action( 'woocommerce_api_check_authentication', array( $this, 'authenticate' ), 90 );
 
 		// Add coupon if the Receiptful API returns an upsell
 		add_action( 'receiptful_add_upsell', array($this, 'create_coupon'), 10, 2 );
@@ -66,11 +60,15 @@ class Receiptful_Email {
 
 
 	/**
+	 * WC Emails.
+	 *
 	 * Remove the WooCommerce Completed Order and New Order emails and add
 	 * Receiptful email in their place.
 	 *
-	 * @param array $emails
-	 * @return array
+	 * @since 1.0.0
+	 *
+	 * @param 	array $emails 	List of existing/registered WC emails.
+	 * @return 	array			List of modified WC emails.
 	 */
 	public function update_woocommerce_email( $emails ) {
 
@@ -84,36 +82,51 @@ class Receiptful_Email {
 		$emails['WC_Email_Customer_Completed_Order']  = include( 'emails/class-receiptful-email-customer-new-order.php' );
 
 		return $emails;
+
 	}
 
 
 	/**
+	 * Remove completed.
+	 *
 	 * Remove the email being sent when order status is set to 'completed'
 	 *
+	 * @since 1.0.0
 	 */
 	public function remove_wc_completed_email() {
 
 		$wc = WC();
-		remove_action( 'woocommerce_order_status_completed' , array( $wc, 'send_transactional_email' ), 10, 10 );
+		remove_action( 'woocommerce_order_status_pending_to_processing', array( $wc, 'send_transactional_email' ), 10 );
+		remove_action( 'woocommerce_order_status_completed', array( $wc, 'send_transactional_email' ), 10 );
 
 	}
 
 
 	/**
-	 * Init the mailer and call our notification for completed order
+	 * Send mail.
 	 *
+	 * Init the mailer and call our notification for completed order.
+	 *
+	 * @since 1.0.0
 	 */
 	public function send_transactional_email() {
 
 		WC()->mailer();
 		$args = func_get_args();
 		do_action_ref_array( 'receiptful_order_status_processing_notification', $args );
+
 	}
 
 
 	/**
-	 * Save Card Data
+	 * Save CC.
 	 *
+	 * Save the last 4 digits of the used credit card.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int	$order_id	Order ID to save the card data to.
+	 * @param array	$posted		List of posted data.
 	 */
 	public function save_card_data( $order_id, $posted ) {
 
@@ -122,61 +135,19 @@ class Receiptful_Email {
 		// save IP address
 
 		return;
-	}
-
-
-	/**
-	 * Authenticate
-	 *
-	 * This function bypasses the authentication for receiptful endpoints
-	 *
-	 * @since 1.0.0
-	 * @param WP_User $user
-	 * @return null|WP_Error|WP_User
-	 */
-	public function authenticate( $user ) {
-
-		if ( '/receiptful-products' === substr( WC()->api->server->path, 0, 20) )
-			return new WP_User( 0 );
-
-		return $user;
-	}
-
-
-	/**
-	 * Load API Endpoints
-	 *
-	 *
-	 *
-	 */
-	public function load_api_endpoints() {
-
-		include_once( 'api/class-receiptful-api-products.php' );
 
 	}
 
 
 	/**
-	 * Add API Classes
+	 * Create coupon.
 	 *
-	 * @param array $classes
-	 * @return array
-	 */
-	public function add_api_classes( $classes ){
-
-		array_push($classes, 'Receiptful_API_Products');
-
-		return $classes;
-
-	}
-
-
-	/**
 	 * Create a coupon when upsell data returned from Receiptful API
 	 *
 	 * @since 1.0.0
-	 * @param array $data
-	 * @return void
+	 *
+	 * @param 	array 	$data
+	 * @param 	int 	$order_id 	ID of the order being processed.
 	 */
 	public function create_coupon( $data, $order_id ) {
 
@@ -198,7 +169,7 @@ class Receiptful_Email {
 
 		if ( $coupon_found ) {
 			// duplicate
-			//return new WP_Error( 'woocommerce_api_coupon_code_already_exists', __( 'The coupon code already exists', 'woocommerce' ), array( 'status' => 400 ) );
+			//return new WP_Error( 'woocommerce_api_coupon_code_already_exists', __( 'The coupon code already exists', 'receiptful' ), array( 'status' => 400 ) );
 			return;
 		}
 
@@ -209,13 +180,13 @@ class Receiptful_Email {
 			switch ( wc_clean( $data['couponType'] ) ) {
 				case 1:
 					$discount_type = 'fixed_cart';
-					break;
+				break;
 				case 2:
 					$discount_type = 'percent';
-					break;
-
+				break;
 				default:
 					$discount_type = 'fixed_cart';
+				break;
 			}
 
 		} elseif( 'shippingcoupon' == $data['upsellType'] ) {
@@ -246,12 +217,12 @@ class Receiptful_Email {
 		);
 
 		$new_coupon = array(
-			'post_title'   => $coupon_code,
-			'post_content' => '',
-			'post_status'  => 'publish',
-			'post_author'  => get_current_user_id(),
-			'post_type'    => 'shop_coupon',
-			'post_excerpt' => isset( $data['title'] ) ? wc_clean( $data['title'] ) : '',
+			'post_title'	=> $coupon_code,
+			'post_content'	=> '',
+			'post_status'	=> 'publish',
+			'post_author'	=> get_current_user_id(),
+			'post_type'		=> 'shop_coupon',
+			'post_excerpt'	=> isset( $data['title'] ) ? wc_clean( $data['title'] ) : '',
 		);
 
 		$id = wp_insert_post( $new_coupon, $wp_error = false );
@@ -289,24 +260,28 @@ class Receiptful_Email {
 
 
 	/**
-	 * Prints the View Receipt button
+	 * Online receipt.
+	 *
+	 * Prints the View Receipt button to view the receipt online.
 	 *
 	 * @since 1.0.0
-	 * @param array $actions
-	 * @param Object $order
-	 * @return array $actions
+	 *
+	 * @param 	array 		$actions	List of existing actions (buttons).
+	 * @param 	WC_Order 	$order		Order object of the current order line.
+	 * @return 	array 					List of modified actions (buttons).
 	 */
 	public function view_receipt_button( $actions, $order ) {
 
-		$receipt_id = get_post_meta( $order->id, '_receiptful_receipt_id', true );
-		$receiptful_web_link = get_post_meta( $order->id, '_receiptful_web_link', true);
+		$receipt_id 			= get_post_meta( $order->id, '_receiptful_receipt_id', true );
+		$receiptful_web_link 	= get_post_meta( $order->id, '_receiptful_web_link', true);
+
 		if ( $receipt_id && $receiptful_web_link ){
 			// Id exists so remove old View button and add Receiptful button
 			unset( $actions['view'] );
 
 			$actions['receipt'] = array(
-				'url'  => $receiptful_web_link['webview'],
-				'name' => __( 'View Receipt', 'woocommerce' )
+				'url'	=> $receiptful_web_link['webview'],
+				'name'	=> __( 'View Receipt', 'receiptful' )
 			);
 		}
 
@@ -316,8 +291,11 @@ class Receiptful_Email {
 
 
 	/**
+	 * Resend queue.
+	 *
 	 * Resend receipts in queue. Called from Cron.
 	 *
+	 * @since 1.0.0
 	 */
 	public static function resend_queue(){
 
@@ -326,12 +304,12 @@ class Receiptful_Email {
 
 		if ( is_array($resend_queue) && ( count( $resend_queue ) > 0 ) ) {
 
-			foreach ( $resend_queue as $key=>$val ) {
+			foreach ( $resend_queue as $key => $val ) {
 				WC()->mailer();
 				// the $val will be an Order (post) ID.
 				$args = array( 0 => $val );
 				do_action_ref_array( 'receiptful_order_status_processing_notification', $args );
-				unset($resend_queue[$key]);
+				unset( $resend_queue[ $key ] );
 			}
 
 			update_option( '_receiptful_resend_queue', $resend_queue );
@@ -342,11 +320,14 @@ class Receiptful_Email {
 
 
 	/**
+	 * Order actions.
+	 *
 	 * Display the Receiptful action in the Order Actions meta box drop down.
 	 *
-	 * @access public
-	 * @param array $actions
-	 * @return array $actions
+	 * @since 1.0.0
+	 *
+	 * @param 	array $actions	List of existing order actions.
+	 * @return 	array 			List of modified order actions.
 	 */
 	function receiptful_order_actions( $actions ) {
 

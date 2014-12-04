@@ -39,29 +39,37 @@ class Receiptful_Api {
 
 
 	/**
-	 * Send new receipt
+	 * Send receipt.
+	 *
+	 * Send the Receiptful receipt based on $args.
 	 *
 	 * @since 1.0.0
-	 * @param array $args
-	 * @return array $response
+	 *
+	 * @param 	array	$args 	API call arguments.
+	 * @return	array			API response.
 	 */
 	public function receipt( $args = array() ) {
 
 		$response = $this->api_call( '/receipts', $args );
 
 		return $response;
+
 	}
 
 
 	/**
-	 * Resend receipt
+	 * Resend receipt.
 	 *
-	 * @param int $receipt_id
-	 * @param array $args
+	 * Resend the previously send Receiptful receipt.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int 	$receipt_id	Receiptful receipt ID, as retreived from original API call.
+	 * @param array $args		API call arguments.
 	 */
 	public function resend_receipt( $receipt_id, $args = array() ) {
 
-		$this->api_call( '/receipts/' . $receipt_id . '/send' , $args, $receipt_id );
+		$this->api_call( '/receipts/' . $receipt_id . '/send', $args );
 
 	}
 
@@ -71,10 +79,11 @@ class Receiptful_Api {
 	 *
 	 * API call to register the usage of a (Receiptful created) coupon).
 	 *
-	 * @since 1.0.0
+	 * @since 1.0.1
 	 *
-	 * @param string 	$coupon_id ID of the coupon used.
-	 * @param array		$args
+	 * @param 	string 	$coupon_id 	ID of the coupon used.
+	 * @param 	array	$args		API arguments.
+	 * @return	array				API response.
 	 */
 	public function coupon_used( $coupon_id, $args = array() ) {
 
@@ -88,18 +97,18 @@ class Receiptful_Api {
 	/**
 	 * API Call
 	 *
+	 * Send a Receiptful API call based on method and arguments.
+	 *
 	 * @since 1.0.0
-	 * @access protected
-	 * 
-	 * @param string $method
-	 * @param array $args
-	 * @return array $response|WP_Error $response
+	 *
+	 * @param 	string 	$method				API method to call.
+	 * @param 	array 	$args				Arguments to pass in the API call.
+	 * @return 	array 	$response|WP_Error 	API response.
 	 */
 	protected function api_call( $method, $args = array() ){
 
-		$url = $this->url;
-
-		$headers	= array( 'X-ApiKey' => $this->api_key );
+		$url 		= $this->url;
+		$headers 	= array( 'X-ApiKey' => $this->api_key );
 
 		$api_response = wp_remote_post( $url . $method , array(
 				'method' 		=> 'POST',
@@ -127,15 +136,17 @@ class Receiptful_Api {
 	/**
 	 * API PUT
 	 *
-	 * @since 1.0.0
-	 * @param string $method
-	 * @param array $args
-	 * @return array $response|WP_Error $response
+	 * API PUT call. Used to track coupon usage.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param 	string 	$method				API method to call.
+	 * @param 	array 	$args				Arguments to pass in the API call.
+	 * @return 	array 	$response|WP_Error 	API response.
 	 */
-	private function api_put( $method, $args = array() ){
+	protected function api_put( $method, $args = array() ){
 
-		$url = $this->url;
-
+		$url 		= $this->url;
 		$headers	= array( 'X-ApiKey' => $this->api_key );
 
 		$api_response = wp_remote_request( $url . $method , array(

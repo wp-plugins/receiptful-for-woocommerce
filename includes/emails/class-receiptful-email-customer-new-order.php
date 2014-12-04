@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
+if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 	/**
 	 * Customer New Order Email
@@ -19,12 +19,14 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 		/**
 		 * Constructor
+		 *
+		 * @since 1.0.0
 		 */
 		function __construct() {
 
 			$this->id 				= 'customer_new_order';
-			$this->title 			= __( 'Receiptful New Order', 'woocommerce' );
-			$this->description		= __( 'Receiptful will send a new order receipt when the order is placed.', 'woocommerce' );
+			$this->title 			= __( 'Receiptful New Order', 'receiptful' );
+			$this->description		= __( 'Receiptful will send a new order receipt when the order is placed.', 'receiptful' );
 
 			// Triggers for this email
 			add_action( 'receiptful_order_status_processing_notification', array( $this, 'trigger' ) );
@@ -37,23 +39,25 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 		/**
 		 * trigger function.
 		 *
-		 * @access public
-		 * @param int $order_id
-		 * @return void
+		 * This is the big function of Receiptful. When this email is triggered
+		 * it will send data (API call) to Receiptful to send the actual receipt.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param int $order_id ID of the order being processed.
 		 */
 		function trigger( $order_id ) {
 
 			if ( $order_id ) {
 
-				$order = wc_get_order( $order_id );
-
-				$receiptful_id = get_post_meta( $order_id, '_receiptful_receipt_id', true );
+				$order 			= wc_get_order( $order_id );
+				$receiptful_id 	= get_post_meta( $order_id, '_receiptful_receipt_id', true );
 
 				if ( ! $receiptful_id == '' ) {
 
 					// receipt exits so resend
 					$order_args = array();
-					$response = Receiptful()->api->resend_receipt( $receiptful_id, $order_args );
+					$response 	= Receiptful()->api->resend_receipt( $receiptful_id, $order_args );
 
 					if ( $response['response']['code'] == '201' ) {
 
@@ -79,10 +83,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 					$product_amount = $item['line_subtotal'] / $item['qty'];
 
 					$items[] = array(
-						'reference'     => $item['product_id'],
-						'description'   => $item['name'],
-						'quantity'      => $item['qty'],
-						'amount'        => $product_amount
+						'reference'		=> $item['product_id'],
+						'description'	=> $item['name'],
+						'quantity'		=> $item['qty'],
+						'amount'		=> $product_amount
 					);
 
 				}
@@ -93,15 +97,15 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 				$tax_display = $order->tax_display_cart;
 
 				if ( $order->get_cart_discount() > 0 ) {
-					$subtotals[] = array( 'description' => __( 'Cart Discount', 'woocommerce') , 'amount' => number_format( (float)  $order->get_cart_discount(), 2, '.', '')  );
+					$subtotals[] = array( 'description' => __( 'Cart Discount', 'receiptful'), 'amount' => number_format( (float)  $order->get_cart_discount(), 2, '.', '') );
 				}
 
 				if ( $order->order_shipping > 0 ) {
-					$subtotals[] = array( 'description' => __( 'Shipping', 'woocommerce') , 'amount' => number_format( (float) $order->order_shipping, 2, '.', '')  );
+					$subtotals[] = array( 'description' => __( 'Shipping', 'receiptful'), 'amount' => number_format( (float) $order->order_shipping, 2, '.', '') );
 				}
 
 				if ( $order->order_shipping_tax > 0 ){
-					$subtotals[] = array( 'description' => __( 'Shipping Tax', 'woocommerce') , 'amount' => number_format( (float) $order->order_shipping_tax, 2, '.', '')  );
+					$subtotals[] = array( 'description' => __( 'Shipping Tax', 'receiptful'), 'amount' => number_format( (float) $order->order_shipping_tax, 2, '.', '') );
 				}
 				if ( $fees = $order->get_fees() )
 
@@ -112,10 +116,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 						}
 
 						if ( 'excl' == $tax_display ) {
-							$subtotals[] = array( 'description' => $fee['name'] , 'amount' => number_format((float) $fee['line_total'], 2, '.', '') );
+							$subtotals[] = array( 'description' => $fee['name'], 'amount' => number_format( (float) $fee['line_total'], 2, '.', '' ) );
 
 						} else {
-							$subtotals[] = array( 'description' => $fee['name'] ,  'amount' => number_format( (float) $fee['line_total'] + $fee['line_tax'], 2, '.', '') );
+							$subtotals[] = array( 'description' => $fee['name'], 'amount' => number_format( (float) $fee['line_total'] + $fee['line_tax'], 2, '.', '' ) );
 
 						}
 					}
@@ -131,14 +135,14 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 					} else {
 
-						$subtotals[] = array( 'description' => WC()->countries->tax_or_vat() , 'amount' => number_format((float)$order->get_total_tax(), 2, '.', '') );
+						$subtotals[] = array( 'description' => WC()->countries->tax_or_vat(), 'amount' => number_format((float)$order->get_total_tax(), 2, '.', '') );
 
 					}
 				}
 
 				if ( $order->get_order_discount() > 0 ) {
 
-					$subtotals[] = array( 'description' => __( 'Order Discount:', 'woocommerce' ) , 'amount' => '-' . number_format((float)$order->get_order_discount(), 2, '.', '') );
+					$subtotals[] = array( 'description' => __( 'Order Discount:', 'receiptful' ), 'amount' => '-' . number_format((float)$order->get_order_discount(), 2, '.', '') );
 
 				}
 
@@ -154,7 +158,8 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 						$coupon_args = array(
 							'reference'	=> $previous_order_receipt_id,
-							'amount'	=> number_format( (float) $order->get_total(), 2, '.', '' ) ,
+							'amount'	=> number_format( (float) $order->get_total(), 2, '.', '' ),
+							'currency'	=> $order->get_order_currency(),
 						);
 						$response = Receiptful()->api->coupon_used( strtoupper( $coupon ), $coupon_args );
 
@@ -163,50 +168,77 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 				}
 
 
+				// Related products
+				$order_item				= reset( $items );
+				$first_item_id			= $order_item['reference'];
+				$product 				= wc_get_product( $first_item_id );
+				$related_products 		= array();
+				$related_product_ids 	= $product->get_related( 2 );
+
+				if ( ! empty( $related_product_ids ) ) {
+					foreach ( $related_product_ids as $related_id ) {
+
+						$product 		= wc_get_product( $related_id );
+						$product_image  = wp_get_attachment_image_src( $product->get_image_id() );
+						$post_content	= strip_tags( $product->post->post_content );
+						$description 	= ! empty( $product->post_content ) ? substr( $post_content, 0, strpos( $post_content, ' ', 100 ) ) : '';
+
+						$related_products[] = array(
+							'title'			=> $product->get_title(),
+							'actionUrl'		=> get_permalink( $product->id ),
+							'image'			=> $product_image[0],
+							'description'	=> $description,
+						);
+
+					}
+				}
+
+
 				// These values are added to the order at checkout if available.
 				// If not recorded then empty string will be sent.
-				$card_type      = isset( $order->receiptful_card_type ) ? $order->receiptful_card_type : '' ;
-				$last4          = isset( $order->receiptful_last4 ) ? $order->receiptful_last4 : '';
-				$customer_ip    = isset( $order->receitpful_customer_ip ) ? $order->receitpful_customer_ip : '';
+				$card_type		= isset( $order->receiptful_card_type ) 	? $order->receiptful_card_type 		: '' ;
+				$last4			= isset( $order->receiptful_last4 ) 		? $order->receiptful_last4 			: '';
+				$customer_ip	= isset( $order->receitpful_customer_ip ) 	? $order->receitpful_customer_ip 	: '';
 
 				$order_args = array(
-					'reference'  => ltrim( $order->get_order_number(), _x( '#', 'hash before order number', 'woocommerce' ) ),
-					'currency'   => get_woocommerce_currency(),
-					'amount'     => number_format((float) $order->get_total(), 2, '.', '') ,
-					'to'         => $order->billing_email,
-					'from'       => $this->get_from_address(),
-					'card'       => array(
-						'type'  => $card_type,
-						'last4' => $last4
+					'reference'		=> ltrim( $order->get_order_number(), _x( '#', 'hash before order number', 'receiptful' ) ),
+					'currency'		=> get_woocommerce_currency(),
+					'amount'		=> number_format( (float) $order->get_total(), 2, '.', '' ),
+					'to'			=> $order->billing_email,
+					'from'			=> $this->get_from_address(),
+					'card'			=> array(
+						'type'	=> $card_type,
+						'last4'	=> $last4
 					),
-					'items'      => $items,
-					'subtotals'  => $subtotals,
-					'customerIp' => $customer_ip,
-					'billing'    => array(
-						'address' => array(
-							'firstName'    => $order->billing_first_name,
-							'lastName'     => $order->billing_last_name,
-							'company'      => $order->billing_company,
-							'addressLine1' => $order->billing_address_1,
-							'addressLine2' => $order->billing_address_2,
-							'city'         => $order->billing_city,
-							'state'        => $order->billing_state,
-							'postcode'     => $order->billing_postcode,
-							'country'      => $order->billing_country,
+					'items'			=> $items,
+					'subtotals'		=> $subtotals,
+					'upsell'		=> array( 'products' => $related_products ),
+					'customerIp'	=> $customer_ip,
+					'billing'		=> array(
+						'address'	=> array(
+							'firstName'		=> $order->billing_first_name,
+							'lastName'		=> $order->billing_last_name,
+							'company'		=> $order->billing_company,
+							'addressLine1'	=> $order->billing_address_1,
+							'addressLine2'	=> $order->billing_address_2,
+							'city'			=> $order->billing_city,
+							'state'			=> $order->billing_state,
+							'postcode'		=> $order->billing_postcode,
+							'country'		=> $order->billing_country,
 						),
-						'phone'   => $order->billing_phone,
-						'email'   => $order->billing_email
+						'phone'		=> $order->billing_phone,
+						'email'		=> $order->billing_email
 					),
-					'shipping'   => array(
-						'firstName'    => $order->shipping_first_name,
-						'lastName'     => $order->shipping_last_name,
-						'company'      => $order->shipping_company,
-						'addressLine1' => $order->shipping_address_1,
-						'addressLine2' => $order->shipping_address_2,
-						'city'         => $order->shipping_city,
-						'state'        => $order->shipping_state,
-						'postcode'     => $order->shipping_postcode,
-						'country'      => $order->shipping_country,
+					'shipping'		=> array(
+						'firstName'		=> $order->shipping_first_name,
+						'lastName'		=> $order->shipping_last_name,
+						'company'		=> $order->shipping_company,
+						'addressLine1'	=> $order->shipping_address_1,
+						'addressLine2'	=> $order->shipping_address_2,
+						'city'			=> $order->shipping_city,
+						'state'			=> $order->shipping_state,
+						'postcode'		=> $order->shipping_postcode,
+						'country'		=> $order->shipping_country,
 					),
 				);
 
@@ -214,7 +246,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 				if ( is_wp_error( $response ) ) {
 					// queue the message for sending via cron
-					$resend_queue = get_option( '_receiptful_resend_queue' );
+					$resend_queue 	= get_option( '_receiptful_resend_queue' );
 					$resend_queue[] = $order->id;
 					update_option( '_receiptful_resend_queue', $resend_queue );
 
@@ -237,7 +269,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 											. "\n" . "Error Message: " . $response['response']['message'] );
 
 					// queue the message for sending via cron
-					$resend_queue = get_option( '_receiptful_resend_queue' );
+					$resend_queue 	= get_option( '_receiptful_resend_queue' );
 					$resend_queue[] = $order_id;
 					update_option( '_receiptful_resend_queue', $resend_queue );
 				}
@@ -248,18 +280,19 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 
 
 		/**
-		 * Initialise Settings Form Fields
+		 * Email settings.
 		 *
-		 * @access public
-		 * @return void
+		 * Initialize email settings.
+		 *
+		 * @since 1.0.0
 		 */
 		function init_form_fields() {
 
 			$this->form_fields = array(
 				'enabled' => array(
-					'title' 		=> __( 'Enable/Disable', 'woocommerce' ),
+					'title' 		=> __( 'Enable/Disable', 'receiptful' ),
 					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable this email notification', 'woocommerce' ),
+					'label' 		=> __( 'Enable this email notification', 'receiptful' ),
 					'default' 		=> 'yes'
 				),
 			);
@@ -270,6 +303,6 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) :
 	}
 
 
-endif;
+}
 
 return new Receiptful_Email_Customer_New_Order();

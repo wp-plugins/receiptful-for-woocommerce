@@ -69,8 +69,8 @@ class WC_Receiptful_Admin {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param $tabs Array Default tabs used in WC.
-	 * @return array All WC settings tabs including newly added.
+	 * @param 	array	$tabs 	Array of default tabs used in WC.
+	 * @return 	array 			All WC settings tabs including newly added.
 	 */
 	public function settings_tab( $tabs ) {
 
@@ -87,6 +87,8 @@ class WC_Receiptful_Admin {
 	 * Get settings page fields array.
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return array List of settings for the settings page.
 	 */
 	public function get_settings() {
 

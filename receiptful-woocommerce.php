@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.0.1
+ * Version: 1.0.2
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.0.1';
+	public $version = '1.0.2';
 
 
 	/**
@@ -79,6 +79,23 @@ class Receiptful_WooCommerce {
 
 		// Initialize plugin parts
 		$this->init();
+
+
+		// Add the plugin page Settings and Docs links
+		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'receiptful_plugin_links' ));
+
+		// Plugin activation message
+		add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
+
+		// Add tracking script
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+		// Tracking calls
+		add_action( 'wp_footer', array( $this, 'print_scripts' ), 99 );
+
+		// Track order
+		add_action( 'woocommerce_thankyou', array( $this, 'thank_you_tracking' ) );
+
 
 		do_action( 'receiptful_loaded' );
 
@@ -137,12 +154,59 @@ class Receiptful_WooCommerce {
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class-receiptful-api.php';
 		$this->api = new Receiptful_Api();
 
+	}
 
-		// Add the plugin page Settings and Docs links
-		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'receiptful_plugin_links' ));
 
-		// Plugin activation message
-		add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
+	/**
+	 * Enqueue script.
+	 *
+	 * Enqueue Receiptful tracking script to track click conversions.
+	 *
+	 * @since 1.0.2
+	 */
+	public function enqueue_scripts() {
+
+		// Add tracking script
+		wp_enqueue_script( 'receiptful-tracking', 'https://app.receiptful.com/scripts/tracking.js', array(), $this->version, true );
+
+	}
+
+
+	/**
+	 * Print script.
+	 *
+	 * Print initializing javascript.
+	 *
+	 * @since 1.0.2
+	 */
+	public function print_scripts() {
+
+		if ( ! is_checkout() || ( is_checkout() && ! isset( $_GET['order-received'] ) ) ) {
+			?><script>Receiptful.setTrackingCookie();</script><?php
+		}
+
+	}
+
+
+	/**
+	 * Track order.
+	 *
+	 * Track the click conversion on the order thank-you page.
+	 *
+	 * @since 1.0.2
+	 *
+	 * @param int $order_id ID of the order being completed.
+	 */
+	public function thank_you_tracking( $order_id ) {
+
+		$order = wc_get_order( $order_id );
+
+		?><script>
+			Receiptful.conversion.reference = '<?php echo $order->id; ?>';
+			Receiptful.conversion.amount	= <?php echo $order->get_total(); ?>;
+			Receiptful.conversion.currency 	= '<?php echo $order->get_order_currency(); ?>';
+			Receiptful.trackConversion();
+		</script><?php
 
 	}
 
@@ -198,8 +262,8 @@ class Receiptful_WooCommerce {
 	 *
 	 * Get the coupon ID by the coupon code.
 	 *
-	 * @param 	string $coupon_code Code that is used as coupon code.
-	 * @return
+	 * @param 	string 		$coupon_code 	Code that is used as coupon code.
+	 * @return	int|bool					WP_Post ID if coupon is found, otherwise False.
 	 */
 	public function get_coupon_by_code( $coupon_code ) {
 

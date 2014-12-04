@@ -23,7 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 add_filter( 'cron_schedules', 'receiptful_add_quarter_schedule' );
 function receiptful_add_quarter_schedule( $schedules ) {
 
-
 	$schedules['quarter_hour'] = array(
 		'interval' 	=> 60 * 15, // 60 seconds * 15 minutes
 		'display' 	=> __( 'Every quarter', 'receiptful' )
@@ -44,14 +43,15 @@ function receiptful_add_quarter_schedule( $schedules ) {
  * @since 1.0.0
  */
 // Schedule resend receipts event
-if ( ! wp_next_scheduled( 'receiptful_check_resend' ) ) :
+if ( ! wp_next_scheduled( 'receiptful_check_resend' ) ) {
 	wp_schedule_event( 1407110400, 'quarter_hour', 'receiptful_check_resend' ); // 1407110400 is 08 / 4 / 2014 @ 0:0:0 UTC
-endif;
+}
 
 
 /**
+ * Cron function.
  *
- * Resend any receipts in queue
+ * Function being fired by CRON. Resend any receipts in queue.
  *
  * @since 1.0.0
  */
