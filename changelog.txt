@@ -1,6 +1,7 @@
 *** Receiptful for WooCommerce ***
 
 2014-12-04  Version 1.0.2
+* [Add] - Receiptful is now FREE
 * [Add] - Added reporting for email conversions
 * [Improvement] - Refactor the API class
 * [Improvement] - Refactor related products code

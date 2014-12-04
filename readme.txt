@@ -13,14 +13,14 @@ Receiptful replaces and supercharges the default WooCommerce receipts. Just acti
 
 Receiptful supercharges your e-mail receipts to help you earn more money by increasing your Customer Lifetime Value. This plugin works alongside our web app to help you customize your WooCommerce receipts and include targeted upsells / promotions.
 
-**Please Note:** You require a Receiptful account ([sign up here for a 14-day free trial](http://receiptful.com)) for this plugin to be fully functionable.
+**Please Note:** You require a free Receiptful account ([sign up here](http://receiptful.com)) for this plugin to function fully.
 
 == Installation ==
 
 1. Go to the **Plugins > Add New page** in your WordPress admin.
 2. Search for “Receiptful” and install the “Receiptful for WooCommerce” plugin.
 3. Click **Activate Plugin**.
-4. Go to **WooCommerce > Settings > Receiptful** and enter your Receiptful API key. (If you haven't signed up for Receiptful yet, now's the time!)
+4. Go to **WooCommerce > Settings > Receiptful** and enter your Receiptful API key. (If you haven't signed up for Receiptful yet, now is the time!)
 
 That's it! You can now customize your WooCommerce receipts and add upsells via your Receiptful dashboard.
 
@@ -46,6 +46,7 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 == Changelog ==
 
 = 1.0.2 = 03/12/2014
+* [Add] - Receiptful is now FREE
 * [Add] - Added reporting for email conversions
 * [Improvement] - Refactor the API class
 * [Improvement] - Refactor related products code
