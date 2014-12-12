@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.0.2
+ * Version: 1.0.3
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.0.2';
+	public $version = '1.0.3';
 
 
 	/**
@@ -167,7 +167,7 @@ class Receiptful_WooCommerce {
 	public function enqueue_scripts() {
 
 		// Add tracking script
-		wp_enqueue_script( 'receiptful-tracking', 'https://app.receiptful.com/scripts/tracking.js', array(), $this->version, true );
+		wp_enqueue_script( 'receiptful-tracking', 'https://app.receiptful.com/scripts/tracking.js', array(), $this->version, false );
 
 	}
 
@@ -199,12 +199,29 @@ class Receiptful_WooCommerce {
 	 */
 	public function thank_you_tracking( $order_id ) {
 
-		$order = wc_get_order( $order_id );
+		$order 					= wc_get_order( $order_id );
+		$coupon_tracking_code 	= '';
+
+		// Register the usage of Receiptful coupons
+		foreach ( $order->get_used_coupons() as $coupon ) {
+
+			$coupon_id 					= Receiptful()->get_coupon_by_code( $coupon );
+			$coupon_order_id			= get_post_meta( $coupon_id, 'receiptful_coupon_order', true );
+			$previous_order_receipt_id	= get_post_meta( $coupon_order_id, '_receiptful_receipt_id', true );
+			$is_receiptful_coupon 		= get_post_meta( $coupon_id, 'receiptful_coupon', true );
+			$coupon_code				= strtoupper( $coupon );
+
+			if ( 'yes' == $is_receiptful_coupon && $previous_order_receipt_id ) {
+				$coupon_tracking_code = "Receiptful.conversion.couponCode = '$coupon_code';";
+			}
+
+		}
 
 		?><script>
 			Receiptful.conversion.reference = '<?php echo $order->id; ?>';
 			Receiptful.conversion.amount	= <?php echo $order->get_total(); ?>;
 			Receiptful.conversion.currency 	= '<?php echo $order->get_order_currency(); ?>';
+			<?php echo $coupon_tracking_code; ?>
 			Receiptful.trackConversion();
 		</script><?php
 
