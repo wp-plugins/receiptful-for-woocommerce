@@ -48,6 +48,8 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 		 */
 		function trigger( $order_id ) {
 
+			global $wpdb;
+
 			if ( $order_id ) {
 
 				$order 			= wc_get_order( $order_id );
@@ -78,7 +80,58 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				// Sending new receipt
 				$items = array();
 
-				foreach ( $order->get_items() as $item ) {
+				// Setting order item meta
+				foreach ( $order->get_items() as $key => $item ) {
+
+					// Get Item Meta Data
+					$meta_data 	= array();
+					$item_meta 	= $order->get_item_meta( $key );
+					$metadata 	= $order->has_meta( $key );
+
+					foreach ( $metadata as $meta ) {
+						// Skip hidden core fields
+						if ( in_array( $meta['meta_key'], apply_filters( 'woocommerce_hidden_order_itemmeta', array(
+							'_qty',
+							'_tax_class',
+							'_product_id',
+							'_variation_id',
+							'_line_subtotal',
+							'_line_subtotal_tax',
+							'_line_total',
+							'_line_tax',
+						) ) ) ) {
+							continue;
+						}
+
+						// Skip serialised meta
+						if ( is_serialized( $meta['meta_value'] ) ) {
+							continue;
+						}
+
+						// Get attribute data
+						if ( taxonomy_exists( $meta['meta_key'] ) ) {
+							$term           = get_term_by( 'slug', $meta['meta_value'], $meta['meta_key'] );
+							$attribute_name = str_replace( 'pa_', '', wc_clean( $meta['meta_key'] ) );
+							$attribute      = $wpdb->get_var(
+								$wpdb->prepare( "
+										SELECT attribute_label
+										FROM {$wpdb->prefix}woocommerce_attribute_taxonomies
+										WHERE attribute_name = %s;
+									",
+									$attribute_name
+								)
+							);
+
+							$meta['meta_key']   = ( ! is_wp_error( $attribute ) && $attribute ) ? $attribute : $attribute_name;
+							$meta['meta_value'] = ( isset( $term->name ) ) ? $term->name : $meta['meta_value'];
+						}
+
+						$meta_data[] = array(
+							'key'	=> wp_kses_post( urldecode( $meta['meta_key'] ) ),
+							'value'	=> wp_kses_post( urldecode( $meta['meta_value'] ) ),
+						);
+
+					}
 
 					$product_amount = $item['line_subtotal'] / $item['qty'];
 
@@ -86,10 +139,14 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 						'reference'		=> $item['product_id'],
 						'description'	=> $item['name'],
 						'quantity'		=> $item['qty'],
-						'amount'		=> $product_amount
+						'amount'		=> $product_amount,
+						'url'			=> $this->maybe_get_download_url( $item, $order_id ),
+						'metas'			=> $meta_data,
 					);
 
+
 				}
+
 
 				// get all the subtotals that can include
 				// shipping, tax, discount
@@ -104,10 +161,11 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 					$subtotals[] = array( 'description' => __( 'Shipping', 'receiptful'), 'amount' => number_format( (float) $order->order_shipping, 2, '.', '') );
 				}
 
-				if ( $order->order_shipping_tax > 0 ){
+				if ( $order->order_shipping_tax > 0 ) {
 					$subtotals[] = array( 'description' => __( 'Shipping Tax', 'receiptful'), 'amount' => number_format( (float) $order->order_shipping_tax, 2, '.', '') );
 				}
-				if ( $fees = $order->get_fees() )
+
+				if ( $fees = $order->get_fees() ) {
 
 					foreach( $fees as $id => $fee ) {
 
@@ -124,46 +182,27 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 						}
 					}
 
+				}
+
 				// Tax for tax exclusive prices
 				if ( 'excl' == $tax_display ) {
 
 					if ( get_option( 'woocommerce_tax_total_display' ) == 'itemized' ) {
 
 						foreach ( $order->get_tax_totals() as $code => $tax ) {
-							$subtotals[] = array( 'description' => $tax->label, 'amount' => number_format((float)$tax->amount, 2, '.', '') );
+							$subtotals[] = array( 'description' => $tax->label, 'amount' => number_format( (float) $tax->amount, 2, '.', '' ) );
 						}
 
 					} else {
 
-						$subtotals[] = array( 'description' => WC()->countries->tax_or_vat(), 'amount' => number_format((float)$order->get_total_tax(), 2, '.', '') );
+						$subtotals[] = array( 'description' => WC()->countries->tax_or_vat(), 'amount' => number_format( (float)$order->get_total_tax(), 2, '.', '' ) );
 
 					}
 				}
 
 				if ( $order->get_order_discount() > 0 ) {
 
-					$subtotals[] = array( 'description' => __( 'Order Discount:', 'receiptful' ), 'amount' => '-' . number_format((float)$order->get_order_discount(), 2, '.', '') );
-
-				}
-
-				// Register the usage of Receiptful coupons
-				foreach ( $order->get_used_coupons() as $coupon ) {
-
-					$coupon_id 					= Receiptful()->get_coupon_by_code( $coupon );
-					$coupon_order_id			= get_post_meta( $coupon_id, 'receiptful_coupon_order', true );
-					$previous_order_receipt_id	= get_post_meta( $coupon_order_id, '_receiptful_receipt_id', true );
-					$is_receiptful_coupon 		= get_post_meta( $coupon_id, 'receiptful_coupon', true );
-
-					if ( 'yes' == $is_receiptful_coupon && $previous_order_receipt_id ) {
-
-						$coupon_args = array(
-							'reference'	=> $previous_order_receipt_id,
-							'amount'	=> number_format( (float) $order->get_total(), 2, '.', '' ),
-							'currency'	=> $order->get_order_currency(),
-						);
-						$response = Receiptful()->api->coupon_used( strtoupper( $coupon ), $coupon_args );
-
-					}
+					$subtotals[] = array( 'description' => __( 'Order Discount:', 'receiptful' ), 'amount' => '-' . number_format( (float) $order->get_order_discount(), 2, '.', '' ) );
 
 				}
 
@@ -181,7 +220,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 						$product 		= wc_get_product( $related_id );
 						$product_image  = wp_get_attachment_image_src( $product->get_image_id() );
 						$post_content	= strip_tags( $product->post->post_content );
-						$description 	= ! empty( $product->post_content ) ? substr( $post_content, 0, strpos( $post_content, ' ', 100 ) ) : '';
+						$description 	= ! empty( $post_content ) ? substr( $post_content, 0, strpos( $post_content, ' ', 100 ) ) : '';
 
 						$related_products[] = array(
 							'title'			=> $product->get_title(),
@@ -280,6 +319,36 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 
 		/**
+		 * Download url.
+		 *
+		 * Get the download url(s) for the products that are downloadable.
+		 *
+		 * @param	array	$item		Item list param as gotton from $order->get_items().
+		 * @param   int     $order_id	Order ID to get the download url for.
+		 * @return	string				Download URL.
+		 */
+		public function maybe_get_download_url( $item, $order_id ) {
+
+			$urls = null;
+
+			if ( ! is_array( $item ) ) {
+				return null;
+			}
+
+			$order			= wc_get_order( $order_id );
+			$download_ids	= $order->get_item_downloads( $item );
+			$product_id		= $item['variation_id'] > 0 ? $item['variation_id'] : $item['product_id'];
+
+			foreach( $download_ids as $download_id ) {
+				$urls[] = $download_id['download_url'];
+			}
+
+			return is_array( $urls ) ? reset( $urls ) : null; // Return the first result - no multiple downloads supported atm.
+
+		}
+
+
+		/**
 		 * Email settings.
 		 *
 		 * Initialize email settings.
@@ -290,10 +359,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 			$this->form_fields = array(
 				'enabled' => array(
-					'title' 		=> __( 'Enable/Disable', 'receiptful' ),
-					'type' 			=> 'checkbox',
-					'label' 		=> __( 'Enable this email notification', 'receiptful' ),
-					'default' 		=> 'yes'
+					'title'			=> __( 'Enable/Disable', 'receiptful' ),
+					'type'			=> 'checkbox',
+					'label'			=> __( 'Enable this email notification', 'receiptful' ),
+					'default'		=> 'yes'
 				),
 			);
 

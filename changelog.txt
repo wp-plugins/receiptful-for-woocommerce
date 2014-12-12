@@ -1,5 +1,12 @@
 *** Receiptful for WooCommerce ***
 
+2014-12-12  Version 1.0.3
+* [Add] - Support for product meta
+* [Add] - Support for downloadable products (download links in Receipt)
+* [Improvement] - Change the coupon tracking to JS at checkout
+* [Fix] - Bug that caused coupon product restrictions
+* [Fix] - Javascript error on thank you page
+
 2014-12-04  Version 1.0.2
 * [Add] - Receiptful is now FREE
 * [Add] - Added reporting for email conversions
