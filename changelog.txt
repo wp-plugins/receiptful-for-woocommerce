@@ -1,0 +1,39 @@
+*** Receiptful for WooCommerce ***
+
+2014-12-18  Version 1.0.4
+* [Add] - helper function to not copy meta data for subscription renewals
+* [Add] - Send random products as related when none are found by core function
+* [Improvement] - Sending discounts as negative number to API
+* [Improvement] - Refactored helper functions
+* [Fix] - Error when updating WooCommerce version while Receiptful is active
+* [Fix] - for WC Subscriptions emails
+
+2014-12-12  Version 1.0.3
+* [Add] - Support for product meta
+* [Add] - Support for downloadable products (download links in Receipt)
+* [Improvement] - Change the coupon tracking to JS at checkout
+* [Fix] - Bug that caused coupon product restrictions
+* [Fix] - Javascript error on thank you page
+
+2014-12-04  Version 1.0.2
+* [Add] - Receiptful is now FREE
+* [Add] - Added reporting for email conversions
+* [Improvement] - Refactor the API class
+* [Improvement] - Refactor related products code
+* [Improvement] - Add more code commenting
+* [Improvement] - Remove custom API endpoint for coupons
+* [Fix] - WC Pending email sending
+* [Fix] - Email being sent for digital downloads
+
+2014-11-19  Version 1.0.1
+* [Add] - Plugin screens shots + banner + icon
+* [Add] - Coupon usage tracking
+* [Add] - Option to restrict coupon usage to customer email
+* [Add] - WooCommerce 2.1.X support
+* [Improvement] - Change CRON from 60 to 15 minutes
+* [Improvement] - WooCommerce activated check for both network activated and single site
+* [Fix] - Notice when using Free shipping upsell
+* [Fix] - Incorrect coupon expiry date
+
+2014-11-01  Version 1.0.0
+* Initial Release
