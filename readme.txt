@@ -70,6 +70,15 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Changelog ==
 
+= 1.0.4 - 18/12/2014 =
+
+* [Add] - helper function to not copy meta data for subscription renewals
+* [Add] - Send random products as related when none are found by core function
+* [Improvement] - Sending discounts as negative number to API
+* [Improvement] - Refactored helper functions
+* [Fix] - Error when updating WooCommerce version while Receiptful is active
+* [Fix] - for WC Subscriptions emails
+
 = 1.0.3 - 12/12/2014 =
 
 * [Add] - Support for product meta

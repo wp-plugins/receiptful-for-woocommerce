@@ -1,5 +1,13 @@
 *** Receiptful for WooCommerce ***
 
+2014-12-18  Version 1.0.4
+* [Add] - helper function to not copy meta data for subscription renewals
+* [Add] - Send random products as related when none are found by core function
+* [Improvement] - Sending discounts as negative number to API
+* [Improvement] - Refactored helper functions
+* [Fix] - Error when updating WooCommerce version while Receiptful is active
+* [Fix] - for WC Subscriptions emails
+
 2014-12-12  Version 1.0.3
 * [Add] - Support for product meta
 * [Add] - Support for downloadable products (download links in Receipt)

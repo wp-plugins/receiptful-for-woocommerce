@@ -78,6 +78,9 @@ class Receiptful_Email {
 		// Remove WC_Email_Customer_Completed_Order
 		unset( $emails['WC_Email_Customer_Completed_Order'] );
 
+		// Remove WCS_Email_New_Renewal_Order from WC Subscriptions
+		unset( $emails['WCS_Email_New_Renewal_Order'] );
+
 		// Add the Receiptful Completed Order email
 		$emails['WC_Email_Customer_Completed_Order']  = include( 'emails/class-receiptful-email-customer-new-order.php' );
 
@@ -98,6 +101,17 @@ class Receiptful_Email {
 		$wc = WC();
 		remove_action( 'woocommerce_order_status_pending_to_processing', array( $wc, 'send_transactional_email' ), 10 );
 		remove_action( 'woocommerce_order_status_completed', array( $wc, 'send_transactional_email' ), 10 );
+
+		// Remove WooCommerce Subscriptions emails
+		remove_action( 'woocommerce_order_status_pending_to_processing', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_pending_to_completed', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_pending_to_on-hold', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_failed_to_processing_notification', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_failed_to_completed_notification', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_failed_to_on-hold_notification', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_completed', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_generated_manual_renewal_order', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
+		remove_action( 'woocommerce_order_status_failed', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
 
 	}
 
@@ -159,13 +173,7 @@ class Receiptful_Email {
 		$discount_type 		= 'fixed_cart';
 
 		// Check for duplicate coupon codes
-		$coupon_found = $wpdb->get_var( $wpdb->prepare( "
-			SELECT $wpdb->posts.ID
-			FROM $wpdb->posts
-			WHERE $wpdb->posts.post_type = 'shop_coupon'
-			AND $wpdb->posts.post_status = 'publish'
-			AND $wpdb->posts.post_title = '%s'
-		 ", $coupon_code ) );
+		$coupon_found = wc_get_coupon_by_code( $coupon_code );
 
 		if ( $coupon_found ) {
 			// duplicate

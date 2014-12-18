@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.0.3
+ * Version: 1.0.4
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.0.3';
+	public $version = '1.0.4';
 
 
 	/**
@@ -95,6 +95,9 @@ class Receiptful_WooCommerce {
 
 		// Track order
 		add_action( 'woocommerce_thankyou', array( $this, 'thank_you_tracking' ) );
+
+		// Helper functions
+		add_action( 'plugins_loaded', array( $this, 'load_helper_functions' ) );
 
 
 		do_action( 'receiptful_loaded' );
@@ -205,7 +208,7 @@ class Receiptful_WooCommerce {
 		// Register the usage of Receiptful coupons
 		foreach ( $order->get_used_coupons() as $coupon ) {
 
-			$coupon_id 					= Receiptful()->get_coupon_by_code( $coupon );
+			$coupon_id 					= wc_get_coupon_by_code( $coupon );
 			$coupon_order_id			= get_post_meta( $coupon_id, 'receiptful_coupon_order', true );
 			$previous_order_receipt_id	= get_post_meta( $coupon_order_id, '_receiptful_receipt_id', true );
 			$is_receiptful_coupon 		= get_post_meta( $coupon_id, 'receiptful_coupon', true );
@@ -275,30 +278,18 @@ class Receiptful_WooCommerce {
 
 
 	/**
-	 * Coupon by code.
+	 * Helper functions,
 	 *
-	 * Get the coupon ID by the coupon code.
+	 * Load helper functions after all plugins to prevent 'function already exists' errors.
 	 *
-	 * @param 	string 		$coupon_code 	Code that is used as coupon code.
-	 * @return	int|bool					WP_Post ID if coupon is found, otherwise False.
+	 * @since 1.0.4
 	 */
-	public function get_coupon_by_code( $coupon_code ) {
+	public function load_helper_functions() {
 
-		global $wpdb;
-
-		$coupon_id = $wpdb->get_var( $wpdb->prepare( apply_filters( 'woocommerce_coupon_code_query', "
-			SELECT ID
-			FROM $wpdb->posts
-			WHERE post_title = %s
-			AND post_type = 'shop_coupon'
-			AND post_status = 'publish'
-		" ), $coupon_code ) );
-
-		 if ( ! $coupon_id ) {
-		 	return false;
-		 } else {
-		 	return $coupon_id;
-		 }
+		/**
+		 * Helper functions
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/receiptful-helper-functions.php';
 
 	}
 
@@ -309,21 +300,7 @@ class Receiptful_WooCommerce {
 /**
  * Receiptful CRON events
  */
-require_once plugin_dir_path( __FILE__ ) . '/includes/functions-receiptful-cron.php';
-
-
-/**
- *  After plugins are loaded check compatibility based on existence of WooCommerce functions
- */
-add_action( 'plugins_loaded', 'receiptful_compatibility_check' );
-
-function receiptful_compatibility_check() {
-	/**
-	 * Receiptful compatibility functions
-	 */
-	require_once plugin_dir_path( __FILE__ ) . '/includes/functions-receiptful-compatibility.php';
-
-}
+require_once plugin_dir_path( __FILE__ ) . '/includes/receiptful-cron-functions.php';
 
 
 /**

@@ -90,6 +90,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 					foreach ( $metadata as $meta ) {
 						// Skip hidden core fields
+						// Skip meta for WC Subscriptions
 						if ( in_array( $meta['meta_key'], apply_filters( 'woocommerce_hidden_order_itemmeta', array(
 							'_qty',
 							'_tax_class',
@@ -99,6 +100,17 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 							'_line_subtotal_tax',
 							'_line_total',
 							'_line_tax',
+							'_subscription_period',
+							'_subscription_interval',
+							'_subscription_length',
+							'_subscription_trial_length',
+							'_subscription_trial_period',
+							'_subscription_recurring_amount',
+							'_subscription_sign_up_fee',
+							'_recurring_line_total',
+							'_recurring_line_tax',
+							'_recurring_line_subtotal',
+							'_recurring_line_subtotal_tax'
 						) ) ) ) {
 							continue;
 						}
@@ -154,7 +166,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				$tax_display = $order->tax_display_cart;
 
 				if ( $order->get_cart_discount() > 0 ) {
-					$subtotals[] = array( 'description' => __( 'Cart Discount', 'receiptful'), 'amount' => number_format( (float)  $order->get_cart_discount(), 2, '.', '') );
+					$subtotals[] = array(
+						'description' 	=> __( 'Cart Discount', 'receiptful'),
+						'amount' 		=> '-' . number_format( (float)  $order->get_cart_discount(), 2, '.', '' )
+					);
 				}
 
 				if ( $order->order_shipping > 0 ) {
@@ -175,10 +190,8 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 						if ( 'excl' == $tax_display ) {
 							$subtotals[] = array( 'description' => $fee['name'], 'amount' => number_format( (float) $fee['line_total'], 2, '.', '' ) );
-
 						} else {
 							$subtotals[] = array( 'description' => $fee['name'], 'amount' => number_format( (float) $fee['line_total'] + $fee['line_tax'], 2, '.', '' ) );
-
 						}
 					}
 
@@ -201,9 +214,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				}
 
 				if ( $order->get_order_discount() > 0 ) {
-
-					$subtotals[] = array( 'description' => __( 'Order Discount:', 'receiptful' ), 'amount' => '-' . number_format( (float) $order->get_order_discount(), 2, '.', '' ) );
-
+					$subtotals[] = array(
+						'description' 	=> __( 'Order Discount:', 'receiptful' ),
+						'amount' 		=> '-' . number_format( (float) $order->get_order_discount(), 2, '.', '' )
+					);
 				}
 
 
@@ -214,11 +228,16 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				$related_products 		= array();
 				$related_product_ids 	= $product->get_related( 2 );
 
+				// Fallback to random products when no related were found.
+				if ( empty ( $related_product_ids ) ) :
+					$related_product_ids = wc_get_random_products( 2 );
+				endif;
+
 				if ( ! empty( $related_product_ids ) ) {
 					foreach ( $related_product_ids as $related_id ) {
 
 						$product 		= wc_get_product( $related_id );
-						$product_image  = wp_get_attachment_image_src( $product->get_image_id() );
+						$product_image  = wp_get_attachment_image_src( $product->get_image_id(), array( 450, 450 ) );
 						$post_content	= strip_tags( $product->post->post_content );
 						$description 	= ! empty( $post_content ) ? substr( $post_content, 0, strpos( $post_content, ' ', 100 ) ) : '';
 
