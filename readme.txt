@@ -3,7 +3,7 @@ Contributors: receiptful
 Tags: woocommerce, receiptful, ecommerce, email
 Requires at least: 3.0.1
 Tested up to: 4.1
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -69,6 +69,11 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 
 == Changelog ==
+
+= 1.0.5 - 14/01/2015 =
+* [Happy New Year!]
+* [Improvement] - Refactored email WC overrides
+* [Fix] - Warning when descriptions > 100 char
 
 = 1.0.4 - 18/12/2014 =
 

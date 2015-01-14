@@ -72,6 +72,11 @@ class Receiptful_Email {
 	 */
 	public function update_woocommerce_email( $emails ) {
 
+		// Remove triggers
+		remove_action( 'woocommerce_order_status_completed_notification', array( $emails['WC_Email_Customer_Completed_Order'], 'trigger' ) );
+		remove_action( 'woocommerce_order_status_pending_to_processing_notification', array( $emails['WC_Email_Customer_Processing_Order'], 'trigger' ) );
+		remove_action( 'woocommerce_order_status_pending_to_on-hold_notification', array( $emails['WC_Email_Customer_Processing_Order'], 'trigger' ) );
+
 		// Remove WC_Email_Customer_Processing_Order
 		unset( $emails['WC_Email_Customer_Processing_Order'] );
 
@@ -97,10 +102,6 @@ class Receiptful_Email {
 	 * @since 1.0.0
 	 */
 	public function remove_wc_completed_email() {
-
-		$wc = WC();
-		remove_action( 'woocommerce_order_status_pending_to_processing', array( $wc, 'send_transactional_email' ), 10 );
-		remove_action( 'woocommerce_order_status_completed', array( $wc, 'send_transactional_email' ), 10 );
 
 		// Remove WooCommerce Subscriptions emails
 		remove_action( 'woocommerce_order_status_pending_to_processing', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );

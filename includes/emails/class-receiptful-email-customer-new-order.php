@@ -239,7 +239,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 						$product 		= wc_get_product( $related_id );
 						$product_image  = wp_get_attachment_image_src( $product->get_image_id(), array( 450, 450 ) );
 						$post_content	= strip_tags( $product->post->post_content );
-						$description 	= ! empty( $post_content ) ? substr( $post_content, 0, strpos( $post_content, ' ', 100 ) ) : '';
+						$description 	= strlen( $post_content ) <= 100 ? $post_content : substr( $post_content, 0, strrpos( $post_content, ' ', -( strlen( $post_content ) - 100 ) ) );
 
 						$related_products[] = array(
 							'title'			=> $product->get_title(),
