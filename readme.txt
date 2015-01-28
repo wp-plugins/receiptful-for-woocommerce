@@ -1,9 +1,9 @@
 === Receiptful for WooCommerce ===
 Contributors: receiptful
-Tags: woocommerce, receiptful, ecommerce, email
-Requires at least: 3.0.1
+Tags: receiptful, receiptful woocommerce, receipt, receipts, invoice, email, order confirmation, order mail, ecommerce mail
+Requires at least: 3.6.0
 Tested up to: 4.1
-Stable tag: 1.0.5
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,19 +61,33 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Screenshots ==
 
-1. WordPress / WooCommerce Plugin Settings. Just add API key.
-2. Receiptful's dashboard and mission control center.
-3. Customizing your Receiptful template.
-4. Add & activating upsells to be included in your receipts.
-5. Example of customer profile overview with rich meta data.
+1. Receipt comparison WooCommerce VS. Receiptful
+2. WordPress / WooCommerce Plugin Settings. Just add API key.
+3. Receiptful's dashboard and mission control center.
+4. Customizing your Receiptful template.
+5. Add & activating upsells to be included in your receipts.
+6. Example of customer profile overview with rich meta data.
 
 
 == Changelog ==
 
+= 1.1.0 - 28/01/2015 =
+
+* [Add] - Unit tests!
+* [Add] - WooCommerce 2.3 support
+* [Add] - Filters & hooks for extending/modifying
+* [Add] - Receipt comparison screenshot, you should see it ;-)
+* [Improvement] - Payment method to the receipt
+* [Improvement] - Date parameter to the API call to keep order date/time equal
+* [Improvement] - Support for multiple download URLs
+* [Improvement] - Split up compatibility files in separate file
+* [Improvement] - Email class refactor
+
 = 1.0.5 - 14/01/2015 =
+
 * [Happy New Year!]
 * [Improvement] - Refactored email WC overrides
-* [Fix] - Warning when descriptions > 100 char
+* [Fix] - Warning when descriptions < 100 char
 
 = 1.0.4 - 18/12/2014 =
 
