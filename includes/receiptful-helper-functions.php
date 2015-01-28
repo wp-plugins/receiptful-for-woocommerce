@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * Get the coupon ID by the coupon code.
  *
- * @param 	string 		$coupon_code 	Code that is used as coupon code.
+ * @param	string		$coupon_code	Code that is used as coupon code.
  * @return	int|bool					WP_Post ID if coupon is found, otherwise False.
  */
 function wc_get_coupon_by_code( $coupon_code ) {
@@ -21,11 +21,11 @@ function wc_get_coupon_by_code( $coupon_code ) {
 		AND post_status = 'publish'
 	" ), $coupon_code ) );
 
-	 if ( ! $coupon_id ) {
-	 	return false;
-	 } else {
-	 	return $coupon_id;
-	 }
+	if ( ! $coupon_id ) {
+		return false;
+	} else {
+		return $coupon_id;
+	}
 
 }
 
@@ -37,8 +37,8 @@ if ( ! function_exists( 'wc_get_random_products' ) ) {
 	 *
 	 * Get random WC product IDs.
 	 *
-	 * @param 	int 	$limit	Number of products to return
-	 * @return 	array			List of random product IDs.
+	 * @param	int		$limit	Number of products to return
+	 * @return	array			List of random product IDs.
 	 */
 	function wc_get_random_products( $limit = 2 ) {
 
@@ -72,13 +72,14 @@ if ( ! function_exists( 'wc_get_random_products' ) ) {
  * @since		1.0.1
  ***********************************************/
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-/**
- *  Define function to make plugin compatible with WooCommerce 2.1.x
- */
 if ( ! function_exists( 'wc_get_product' ) ) {
 
+	/**
+	 * Define function to make plugin compatible with WooCommerce 2.1.x
+	 *
+	 * @codeCoverageIgnore
+	 */
 	function wc_get_product( $product_id ) {
 
 		return get_product( $product_id );
@@ -86,11 +87,14 @@ if ( ! function_exists( 'wc_get_product' ) ) {
 
 }
 
-/**
- *  Define function to make plugin compatible with WooCommerce 2.1.x
- */
+
 if ( ! function_exists( 'wc_get_order' ) ) {
 
+	/**
+	 * Define function to make plugin compatible with WooCommerce 2.1.x
+	 *
+	 * @codeCoverageIgnore
+	 */
 	function wc_get_order( $order ) {
 
 		$order_id = 0;
@@ -105,4 +109,5 @@ if ( ! function_exists( 'wc_get_order' ) ) {
 
 		return new WC_Order( $order_id );
 	}
+
 }

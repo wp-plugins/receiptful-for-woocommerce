@@ -4,15 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * Class Receiptful_Api.
  *
- *
- * @class       Receiptful_Api
- * @version     1.0.0
- * @author      Receiptful
+ * @class		Receiptful_Api
+ * @version		1.0.0
+ * @author		Receiptful
  */
 class Receiptful_Api {
 
 	/**
-	 * Receiptful API key
+	 * Receiptful API key.
 	 *
 	 * @since 1.0.0
 	 * @var $api_key
@@ -20,12 +19,12 @@ class Receiptful_Api {
 	public $api_key;
 
 	/**
-	 * URL for Receiptful
+	 * URL for Receiptful.
 	 *
 	 * @since 1.0.0
 	 * @var $url
 	 */
-	protected $url = 'https://app.receiptful.com/api/v1';
+	public $url = 'https://app.receiptful.com/api/v1';
 
 
 	/**
@@ -45,7 +44,7 @@ class Receiptful_Api {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param 	array	$args 	API call arguments.
+	 * @param	array	$args	API call arguments.
 	 * @return	array			API response.
 	 */
 	public function receipt( $args = array() ) {
@@ -64,49 +63,50 @@ class Receiptful_Api {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int 	$receipt_id	Receiptful receipt ID, as retreived from original API call.
-	 * @param array $args		API call arguments.
+	 * @param	int				$receipt_id		Receiptful receipt ID, as retreived from original API call.
+	 * @return	array|WP_Error					WP_Error when the API call fails, otherwise the API response.
 	 */
-	public function resend_receipt( $receipt_id, $args = array() ) {
+	public function resend_receipt( $receipt_id ) {
 
-		$this->api_call( '/receipts/' . $receipt_id . '/send', $args );
+		$response = $this->api_call( '/receipts/' . $receipt_id . '/send' );
+
+		return $response;
 
 	}
 
 
 	/**
-	 * API Call
+	 * API Call.
 	 *
 	 * Send a Receiptful API call based on method and arguments.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param 	string 	$method				API method to call.
-	 * @param 	array 	$args				Arguments to pass in the API call.
-	 * @return 	array 	$response|WP_Error 	API response.
+	 * @param	string	$method				API method to call.
+	 * @param	array	$args				Arguments to pass in the API call.
+	 * @return	array	$response|WP_Error	API response.
 	 */
-	protected function api_call( $method, $args = array() ){
+	protected function api_call( $method, $args = array() ) {
 
-		$url 		= $this->url;
-		$headers 	= array( 'X-ApiKey' => $this->api_key );
+		$headers = array( 'X-ApiKey' => $this->api_key );
 
-		$api_response = wp_remote_post( $url . $method , array(
-				'method' 		=> 'POST',
-				'timeout' 		=> 45,
-				'redirection' 	=> 5,
-				'httpversion' 	=> '1.0',
-				'blocking' 		=> true,
-				'headers' 		=> $headers,
-				'body' 			=> $args,
-				'cookies' 		=> array()
+		$api_response = wp_remote_post( $this->url . $method, array(
+				'method'		=> 'POST',
+				'timeout'		=> 45,
+				'redirection'	=> 5,
+				'httpversion'	=> '1.0',
+				'blocking'		=> true,
+				'headers'		=> $headers,
+				'body'			=> $args,
+				'cookies'		=> array()
 			)
 		);
 
 		if ( is_wp_error( $api_response ) ) {
 			return $api_response;
 		} else {
-			$response['response']   = $api_response['response'];
-			$response['body']       = $api_response['body'];
+			$response['response']	= $api_response['response'];
+			$response['body']		= $api_response['body'];
 			return $response;
 		}
 
