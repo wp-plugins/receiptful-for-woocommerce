@@ -53,7 +53,7 @@ class Receiptful_Email {
 		// Add option to Order Actions meta box on the Edit Order admin page
 		add_action( 'woocommerce_order_actions', array( $this, 'receiptful_order_actions' ) );
 
-		// Order Actions callbacks
+		// Order Action callback
 		add_action( 'woocommerce_order_action_receiptful_send_receipt', array( $this, 'send_transactional_email' ), 60);
 
 	}
@@ -140,8 +140,6 @@ class Receiptful_Email {
 	 * @return  int     $id         ID of new coupon
 	 */
 	public function create_coupon( $data, $order_id ) {
-
-		global $wpdb;
 
 		$order				= wc_get_order( $order_id );
 		$coupon_code		= apply_filters( 'woocommerce_coupon_code', wc_clean( $data['couponCode'] ) );
@@ -281,11 +279,11 @@ class Receiptful_Email {
 
 		if ( is_array( $resend_queue ) && ( count( $resend_queue ) > 0 ) ) {
 
-			foreach ( $resend_queue as $key => $val ) {
+			foreach ( $resend_queue as $key => $order_id ) {
 				WC()->mailer();
-				// the $val will be an Order (post) ID.
-				$args = array( 0 => $val );
-				do_action_ref_array( 'receiptful_order_status_processing_notification', $args );
+				do_action_ref_array( 'receiptful_order_status_processing_notification', array( 0 => $order_id ) );
+				$receiptful_email = new Receiptful_Email_Customer_New_Order();
+				$response = $receiptful_email->trigger( $order_id );
 				unset( $resend_queue[ $key ] );
 			}
 
@@ -306,7 +304,7 @@ class Receiptful_Email {
 	 * @param	array $actions	List of existing order actions.
 	 * @return	array			List of modified order actions.
 	 */
-	function receiptful_order_actions( $actions ) {
+	public function receiptful_order_actions( $actions ) {
 
 		if ( is_array( $actions ) ) {
 			$actions['receiptful_send_receipt'] = __( 'Send receipt', 'receiptful' );

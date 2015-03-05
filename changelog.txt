@@ -1,5 +1,14 @@
 *** Receiptful for WooCommerce ***
 
+2015-03-05 Version 1.1.1
+* [Add] - Product sync for better recommendations
+* [Fix] - load translation files
+* [Improvement] - Subtotals refactor
+* [Improvement] - CDN for JavaScript - Improving loading time
+* [Improvement] - Small queue improvements (don't add 400 response to queue)
+* [Improvement] - Subscriptions email notifications
+
+
 2015-01-28  Version 1.1.0
 * [Add] - Unit tests!
 * [Add] - WooCommerce 2.3 support

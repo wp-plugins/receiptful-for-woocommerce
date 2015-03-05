@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.1.0
+ * Version: 1.1.1
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.0';
+	public $version = '1.1.1';
 
 
 	/**
@@ -80,25 +80,11 @@ class Receiptful_WooCommerce {
 		// Initialize plugin parts
 		$this->init();
 
+		// Plugin hooks
+		$this->hooks();
 
-		// Add the plugin page Settings and Docs links
-		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'receiptful_plugin_links' ));
-
-		// Plugin activation message
-		add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
-
-		// Add tracking script
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-		// Tracking calls
-		add_action( 'wp_footer', array( $this, 'print_scripts' ), 99 );
-
-		// Track order
-		add_action( 'woocommerce_thankyou', array( $this, 'thank_you_tracking' ) );
-
-		// Helper functions
-		add_action( 'plugins_loaded', array( $this, 'load_helper_functions' ) );
-
+		// Textdomain
+		$this->load_textdomain();
 
 		do_action( 'receiptful_loaded' );
 
@@ -158,9 +144,60 @@ class Receiptful_WooCommerce {
 		$this->api = new Receiptful_Api();
 
 		/**
+		 * Receiptful Products sync
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/class-receiptful-products.php';
+		$this->products = new Receiptful_Products();
+
+		/**
 		 * Subscription integration.
 		 */
 		require_once plugin_dir_path( __FILE__ ) . '/includes/integrations/woocommerce-subscriptions.php';
+
+	}
+
+
+	/**
+	 * Hooks.
+	 *
+	 * Initial plugin hooks.
+	 *
+	 * @since 1.1.1
+	 */
+	public function hooks() {
+
+		// Add the plugin page Settings and Docs links
+		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'receiptful_plugin_links' ));
+
+		// Plugin activation message
+		add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
+
+		// Add tracking script
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+		// Tracking calls
+		add_action( 'wp_footer', array( $this, 'print_scripts' ), 99 );
+
+		// Track order
+		add_action( 'woocommerce_thankyou', array( $this, 'thank_you_tracking' ) );
+
+		// Helper functions
+		add_action( 'plugins_loaded', array( $this, 'load_helper_functions' ) );
+
+	}
+
+
+	/**
+	 * Textdomain.
+	 *
+	 * Load the textdomain based on WP language.
+	 *
+	 * @since 1.1.1
+	 */
+	public function load_textdomain() {
+
+		// Load textdomain
+		load_plugin_textdomain( 'woocommerce-receiptful', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 	}
 
@@ -175,7 +212,7 @@ class Receiptful_WooCommerce {
 	public function enqueue_scripts() {
 
 		// Add tracking script
-		wp_enqueue_script( 'receiptful-tracking', 'https://app.receiptful.com/scripts/tracking.js', array(), $this->version, false );
+		wp_enqueue_script( 'receiptful-tracking', 'https://media.receiptful.com/scripts/tracking.js', array(), $this->version, false );
 
 	}
 
@@ -266,10 +303,14 @@ class Receiptful_WooCommerce {
 
 
 	/**
-	 * Plugin page links
+	 * Plugin page link.
 	 *
-	 * @param array $links
-	 * @return array
+	 * Add a 'settings' link to the plugin on the plugins page.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param 	array $links	List of existing plugin links.
+	 * @return 	array			List of modified plugin links.
 	 */
 	function receiptful_plugin_links( $links ) {
 
@@ -294,16 +335,15 @@ class Receiptful_WooCommerce {
 		 */
 		require_once plugin_dir_path( __FILE__ ) . '/includes/receiptful-helper-functions.php';
 
+		/**
+		 * Receiptful CRON events
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/receiptful-cron-functions.php';
+
 	}
 
 
 }
-
-
-/**
- * Receiptful CRON events
- */
-require_once plugin_dir_path( __FILE__ ) . '/includes/receiptful-cron-functions.php';
 
 
 /**

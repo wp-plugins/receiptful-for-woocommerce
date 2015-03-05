@@ -1,0 +1,127 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Receiptful for WooCommerce\n"
+"POT-Creation-Date: 2015-03-02 10:24+0100\n"
+"PO-Revision-Date: 2015-03-02 10:26+0100\n"
+"Last-Translator: \n"
+"Language-Team: Receiptful\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.1\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e;_x\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../includes/admin/class-receiptful-admin.php:77
+msgid "Receiptful"
+msgstr ""
+
+#: ../includes/admin/class-receiptful-admin.php:98
+msgid "Receiptful General"
+msgstr ""
+
+#: ../includes/admin/class-receiptful-admin.php:100
+#, php-format
+msgid ""
+"To get started with Receiptful, please add your API key (<a href='%s' "
+"target='_blank'>which you can find here</a>) and save the settings."
+msgstr ""
+
+#: ../includes/admin/class-receiptful-admin.php:104
+msgid "API Key"
+msgstr ""
+
+#: ../includes/admin/class-receiptful-admin.php:118
+#, php-format
+msgid "<a href='%s'>Edit My Template</a> | <a href='%s'>View Statistics</a>"
+msgstr ""
+
+#: ../includes/class-receiptful-email.php:261
+msgid "View Receipt"
+msgstr ""
+
+#: ../includes/class-receiptful-email.php:312
+msgid "Send receipt"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:28
+msgid "Receiptful New Order"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:29
+msgid "Receiptful will send a new order receipt when the order is placed."
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:51
+msgid "Enable/Disable"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:53
+msgid "Enable this email notification"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:126
+#, php-format
+msgid ""
+"Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error "
+"Message: %2$s"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:172
+#, php-format
+msgid ""
+"Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error "
+"Message: %2$s"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:295
+msgid "Subtotal"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:299
+msgid "Discount"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:304
+msgid "Shipping"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:414
+#: ../tests/unit-tests/api.php:56
+msgid "#"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:457
+#, php-format
+msgid "Includes %1$s %2$s"
+msgstr ""
+
+#: ../includes/emails/class-receiptful-email-customer-new-order.php:487
+#, php-format
+msgid "Download %s"
+msgstr ""
+
+#: ../includes/receiptful-cron-functions.php:28
+msgid "Every quarter"
+msgstr ""
+
+#: ../receiptful-woocommerce.php:271
+msgid ""
+"Receiptful has been activated. Please click <a href=\"admin.php?page=wc-"
+"settings&tab=receiptful\">here</a> to add your API key & supercharge your receipts."
+msgstr ""
+
+#: ../receiptful-woocommerce.php:293
+msgid "Settings"
+msgstr ""
+
+#: ../tests/framework/factories/class-wc-unit-test-factory-for-webhook-delivery.php:22
+msgid "WooCommerce"
+msgstr ""
+
+#: ../tests/unit-tests/emails/new-order-email.php:272
+msgid "Size"
+msgstr ""

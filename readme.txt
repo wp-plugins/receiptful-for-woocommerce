@@ -3,7 +3,7 @@ Contributors: receiptful
 Tags: receiptful, receiptful woocommerce, receipt, receipts, invoice, email, order confirmation, order mail, ecommerce mail
 Requires at least: 3.6.0
 Tested up to: 4.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,19 +13,19 @@ Receiptful replaces and supercharges the default WooCommerce receipts. Just acti
 
 = What you would experience =
 
-**Increased customer lifetime value**  
+**Increased customer lifetime value**
 We're sending out some beautiful emails combined with a good upsell for your customer. Offering a deal to your existing customers will increase their average lifetime!
 
-**Increasing revenue**  
+**Increasing revenue**
 Because the customer loved **your** service, and gets a great deal for their next order, they will soon order again! Giving you extra revenue.
 
-**Setup in less than 10 minutes**  
-As described below, setup is easy and quick! 10 minutes for increased revue? *Who wouldn't want that?!*
+**Setup in less than 10 minutes**
+As described below, setup is easy and quick! 10 minutes for increased revenue? *Who wouldn't want that?!*
 
-**Why FREE?**  
+**Why FREE?**
 You can read about why we made Receiptful free here: [Taking a Moonshot](https://receiptful.com/blog/taking-a-moonshot/)
 
-**Quick setup**  
+**Quick setup**
 Installing Receiptful is simple.
 
 1. Download & Activate this plugin
@@ -35,10 +35,12 @@ Installing Receiptful is simple.
 
 Simple huh?!
 
-**Need help?**  
+**Need help?**
 [Open a support ticket](https://wordpress.org/support/plugin/receiptful-for-woocommerce), We're here to make your life easier!
 
 **Please Note:** You require a Receiptful account ([sign up here for a 100% **FREE** account](http://receiptful.com))
+
+[youtube https://www.youtube.com/watch?v=ae3eG7CqUrA&modestbranding=1&controls=0&autohide=1&wmode=transparent&enablejsapi=1&html5=1&rel=0&vq=hd1080]
 
 == Installation ==
 
@@ -70,6 +72,15 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 
 == Changelog ==
+
+= 1.1.1 - 05/03/2015 =
+
+* [Add] - Product sync for better recommendations
+* [Fix] - load translation files
+* [Improvement] - Subtotals refactor
+* [Improvement] - CDN for JavaScript - Improving loading time
+* [Improvement] - Small queue improvements (don't add 400 response to queue)
+* [Improvement] - Subscriptions email notifications
 
 = 1.1.0 - 28/01/2015 =
 

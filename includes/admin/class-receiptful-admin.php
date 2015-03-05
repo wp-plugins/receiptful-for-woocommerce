@@ -102,7 +102,7 @@ class Receiptful_Admin {
 			),
 			array(
 				'title'		=> __( 'API Key', 'woocommerce-receiptful' ),
-				'desc'		=> __( '', 'woocommerce-receiptful' ),
+				'desc'		=> '',
 				'id'		=> 'receiptful_api_key',
 				'default'	=> '',
 				'type'		=> 'text',

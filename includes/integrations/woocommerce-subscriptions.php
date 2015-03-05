@@ -20,33 +20,26 @@ add_filter( 'woocommerce_email_classes', 'receiptful_wcs_remove_email', 90 );
  */
 function receiptful_wcs_remove_email( $emails ) {
 
-	unset( $emails['WCS_Email_New_Renewal_Order'] );
+	// Don't unset when the email doesn't exist
+	if ( ! isset( $emails['WCS_Email_Completed_Renewal_Order'] ) || ! isset( $emails['WCS_Email_Processing_Renewal_Order'] ) ) {
+		return $emails;
+	}
+
+	// Remove triggers - prevent mails from sending
+	remove_action( 'woocommerce_order_status_completed_renewal_notification', array( $emails['WCS_Email_Completed_Renewal_Order'], 'trigger' ) );
+
+	remove_action( 'woocommerce_order_status_pending_to_processing_renewal_notification', array( $emails['WCS_Email_Processing_Renewal_Order'], 'trigger' ) );
+	remove_action( 'woocommerce_order_status_pending_to_completed_renewal_notification', array( $emails['WCS_Email_Processing_Renewal_Order'], 'trigger' ) );
+	remove_action( 'woocommerce_order_status_pending_to_on-hold_renewal_notification', array( $emails['WCS_Email_Processing_Renewal_Order'], 'trigger' ) );
+	remove_action( 'woocommerce_order_status_failed_to_processing_renewal_notification', array( $emails['WCS_Email_Processing_Renewal_Order'], 'trigger' ) );
+	remove_action( 'woocommerce_order_status_failed_to_completed_renewal_notification', array( $emails['WCS_Email_Processing_Renewal_Order'], 'trigger' ) );
+	remove_action( 'woocommerce_order_status_failed_to_on-hold_renewal_notification', array( $emails['WCS_Email_Processing_Renewal_Order'], 'trigger' ) );
+
+	// Remove emails - remove setting pages
+	unset( $emails['WCS_Email_Completed_Renewal_Order'] );
+	unset( $emails['WCS_Email_Processing_Renewal_Order'] );
 
 	return $emails;
-
-}
-
-
-add_action( 'init', 'remove_wcs_completed_email' );
-/**
- * Remove completed.
- *
- * Remove the email being sent when order status is set to 'completed'.
- *
- * @since 1.1.0
- */
-function remove_wcs_completed_email() {
-
-	// Remove WooCommerce Subscriptions emails
-	remove_action( 'woocommerce_order_status_pending_to_processing', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_pending_to_completed', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_pending_to_on-hold', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_failed_to_processing_notification', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_failed_to_completed_notification', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_failed_to_on-hold_notification', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_completed', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_generated_manual_renewal_order', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
-	remove_action( 'woocommerce_order_status_failed', 'WC_Subscriptions_Email::send_renewal_order_email', 10 );
 
 }
 

@@ -103,6 +103,8 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			// Handle response
 			if ( is_wp_error( $response ) ) {
 
+				$order->add_order_note( sprintf( __( 'Error sending customer receipt via Receiptful. <br/> Error Message: %s. <br/> Receipt added to resend queue.', 'receiptful' ), implode( ', ', $response->get_error_messages() ) ) );
+
 				// queue the message for sending via cron
 				$resend_queue	= get_option( '_receiptful_resend_queue' );
 				$resend_queue[]	= $order->id;
@@ -121,14 +123,20 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 					do_action( 'receiptful_add_upsell', $upsell, $order->id );
 				}
 
+			} elseif ( in_array( $response['response']['code'], array( '401', '500', '503' ) ) ) {
+
+				$order->add_order_note( sprintf( __( 'Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s. Receipt added to resend queue.', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
+
+				if ( $response['response']['code'] != 400 ) {
+					// queue the message for sending via cron
+					$resend_queue	= get_option( '_receiptful_resend_queue' );
+					$resend_queue[]	= $order->id;
+					update_option( '_receiptful_resend_queue', $resend_queue );
+				}
+
 			} else {
 
-				$order->add_order_note( sprintf( __( 'Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
-
-				// queue the message for sending via cron
-				$resend_queue	= get_option( '_receiptful_resend_queue' );
-				$resend_queue[]	= $order->id;
-				update_option( '_receiptful_resend_queue', $resend_queue );
+				$order->add_order_note( sprintf( __( 'Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s.', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
 
 			}
 
@@ -157,6 +165,8 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 			if ( is_wp_error( $response ) ) {
 
+				$order->add_order_note( sprintf( __( 'Error resending customer receipt via Receiptful. <br/> Error Message: %s. <br/> Receipt added to resend queue.', 'receiptful' ), implode( ', ', $response->get_error_messages() ) ) );
+
 				// queue the message for sending via cron
 				$resend_queue	= get_option( '_receiptful_resend_queue' );
 				$resend_queue[] = $order->id;
@@ -167,9 +177,18 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				$order->add_order_note( 'Customer receipt resent via Receiptful.' );
 				$body = json_decode( $response ['body'], true );
 
+			} elseif ( in_array( $response['response']['code'], array( '401', '500', '503' ) ) ) {
+
+				$order->add_order_note( sprintf( __( 'Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s. Receipt added to resend queue.', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
+
+				// queue the message for sending via cron
+				$resend_queue	= get_option( '_receiptful_resend_queue' );
+				$resend_queue[] = $order->id;
+				update_option( '_receiptful_resend_queue', $resend_queue );
+
 			} else {
 
-				$order->add_order_note( sprintf( __( 'Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
+				$order->add_order_note( sprintf( __( 'Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s.', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
 
 			}
 
@@ -249,13 +268,16 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 				}
 
-				$product_amount = $item['line_subtotal'] / $item['qty'];
+
+
+				$inc_tax = 'incl' == $order->tax_display_cart ? true : false;
+				$product_amount = $order->get_line_subtotal( $item, $inc_tax, false ) / $item['qty'];
 
 				$items[] = array(
 					'reference'		=> $item['product_id'],
 					'description'	=> $item['name'],
 					'quantity'		=> $item['qty'],
-					'amount'		=> $product_amount,
+					'amount'		=> number_format( (float) $product_amount, 2, '.', '' ),
 					'downloadUrls'	=> $this->maybe_get_download_urls( $item, $order->id ),
 					'metas'			=> $meta_data,
 				);
@@ -283,23 +305,23 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			$subtotals		= array();
 			$tax_display	= $order->tax_display_cart;
 
+			// Subtotal
+			$subtotal 	= 0;
+			$inc_tax	= 'incl' == $order->tax_display_cart ? true : false;
+			foreach ( $order->get_items() as $key => $item ) {
+				$subtotal += $order->get_line_subtotal( $item, $inc_tax, true );
+			}
+			$subtotals[] = array( 'description' => __( 'Subtotal', 'receiptful' ), 'amount' => number_format( (float) $subtotal, 2, '.', '' ) );
 
 			// Discount
 			if ( $order->get_total_discount() > 0 ) {
-				$subtotals[] = array(
-					'description'	=> __( 'Discount', 'receiptful' ),
-					'amount'		=> '-' . number_format( (float) $order->get_total_discount(), 2, '.', '' )
-				);
+				$subtotals[] = array( 'description' => __( 'Discount', 'receiptful' ), 'amount'	=> '-' . number_format( (float) $order->get_total_discount(), 2, '.', '' ) );
 			}
 
 			// Shipping
 			if ( $order->order_shipping > 0 ) {
-				$subtotals[] = array( 'description' => __( 'Shipping', 'receiptful' ), 'amount' => number_format( (float) $order->order_shipping, 2, '.', '' ) );
-			}
-
-			// Shipping tax
-			if ( $order->order_shipping_tax > 0 ) {
-				$subtotals[] = array( 'description' => sprintf( __( 'Shipping %1$s', 'receiptful' ), WC()->countries->tax_or_vat() ), 'amount' => number_format( (float) $order->order_shipping_tax, 2, '.', '' ) );
+				$shipping_total = 'excl' == $tax_display ? $order->order_shipping : ( $order->order_shipping + $order->order_shipping_tax );
+				$subtotals[] = array( 'description' => __( 'Shipping', 'receiptful' ), 'amount' => number_format( (float) $shipping_total, 2, '.', '' ) );
 			}
 
 			// Fees
@@ -357,9 +379,9 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			$related_product_ids	= $product->get_related( 2 );
 
 			// Fallback to random products when no related were found.
-			if ( empty ( $related_product_ids ) ) :
+			if ( empty ( $related_product_ids ) ) {
 				$related_product_ids = wc_get_random_products( 2 );
-			endif;
+			}
 
 			if ( ! empty( $related_product_ids ) ) {
 				foreach ( $related_product_ids as $related_id ) {
@@ -450,6 +472,11 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				),
 			);
 
+			if ( 'incl' == $order->tax_display_cart ) {
+				$tax_total 					= number_format( (float) $order->get_total_tax(), 2, '.', '' );
+				$order_args['amountNotes'] 	= sprintf( _x( 'Includes %1$s %2$s', 'Includes $12.00 TAX', 'receiptful' ), $tax_total, WC()->countries->tax_or_vat() );
+			}
+
 			return apply_filters( 'receiptful_api_args_order_args', $order_args, $order, $items, $subtotals, $related_products );
 
 		}
@@ -477,7 +504,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			$product_id		= $item['variation_id'] > 0 ? $item['variation_id'] : $item['product_id'];
 
 			foreach ( $download_ids as $download ) {
-				$urls[] = array( 'key' => sprintf( __( 'Download %s', 'Receiptful' ), $download['name'] ), 'value' => $download['download_url'] );
+				$urls[] = array( 'key' => sprintf( __( 'Download %s', 'receiptful' ), $download['name'] ), 'value' => $download['download_url'] );
 			}
 
 			$urls = apply_filters( 'receiptful_get_download_urls', $urls, $item, $order_id );
