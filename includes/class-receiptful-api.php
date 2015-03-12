@@ -135,6 +135,26 @@ class Receiptful_Api {
 
 
 	/**
+	 * Upload receipts.
+	 *
+	 * Bulk upload old receipts to sync with Receiptful. This ensures
+	 * better quality recommendations for similar products.
+	 *
+	 * @since 1.1.2
+	 *
+	 * @param	int				$args	List of formatted receipts according the API specs.
+	 * @return	array|WP_Error			WP_Error when the API call fails, otherwise the API response.
+	 */
+	public function upload_receipts( $args ) {
+
+		$response = $this->api_call( '/receipts/bulk', $args );
+
+		return $response;
+
+	}
+
+
+	/**
 	 * API Call.
 	 *
 	 * Send a Receiptful API call based on method and arguments.

@@ -176,11 +176,11 @@ class Receiptful_Email {
 
 		}
 
-		$coupon_data = array(
+		$coupon_data = apply_filters( 'receiptful_coupon_data', array(
 			'type'							=> $discount_type,
 			'amount'						=> isset( $data['amount'] ) ? wc_clean( $data['amount'] ) : '',
 			'individual_use'				=> 'yes',
-			'product_ids'					=> $data['products'],
+			'product_ids'					=> '',
 			'exclude_product_ids'			=> array(),
 			'usage_limit'					=> '1',
 			'usage_limit_per_user'			=> '1',
@@ -195,7 +195,7 @@ class Receiptful_Email {
 			'minimum_amount'				=> '',
 			'maximum_amount'				=> '',
 			'customer_email'				=> ! empty( $data['emailLimit'] ) ? array( $order->billing_email ) : array(),
-		);
+		), $order_id, $data );
 
 		$new_coupon = array(
 			'post_title'	=> $coupon_code,
@@ -279,12 +279,16 @@ class Receiptful_Email {
 
 		if ( is_array( $resend_queue ) && ( count( $resend_queue ) > 0 ) ) {
 
+			WC()->mailer();
 			foreach ( $resend_queue as $key => $order_id ) {
-				WC()->mailer();
-				do_action_ref_array( 'receiptful_order_status_processing_notification', array( 0 => $order_id ) );
-				$receiptful_email = new Receiptful_Email_Customer_New_Order();
-				$response = $receiptful_email->trigger( $order_id );
-				unset( $resend_queue[ $key ] );
+
+				$receiptful_email 	= new Receiptful_Email_Customer_New_Order();
+				$response 			= $receiptful_email->trigger( $order_id );
+
+				if ( ! is_wp_error( $response ) && in_array( $response['response']['code'], array( '200', '201', '400' ) ) ) {
+					unset( $resend_queue[ $key ] );
+				}
+
 			}
 
 			update_option( '_receiptful_resend_queue', $resend_queue );

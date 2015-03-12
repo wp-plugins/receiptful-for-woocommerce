@@ -127,12 +127,10 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 				$order->add_order_note( sprintf( __( 'Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error Message: %2$s. Receipt added to resend queue.', 'receiptful' ), $response['response']['code'], $response['response']['message'] ) );
 
-				if ( $response['response']['code'] != 400 ) {
-					// queue the message for sending via cron
-					$resend_queue	= get_option( '_receiptful_resend_queue' );
-					$resend_queue[]	= $order->id;
-					update_option( '_receiptful_resend_queue', $resend_queue );
-				}
+				// queue the message for sending via cron
+				$resend_queue	= get_option( '_receiptful_resend_queue' );
+				$resend_queue[]	= $order->id;
+				update_option( '_receiptful_resend_queue', $resend_queue );
 
 			} else {
 
@@ -268,9 +266,15 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 				}
 
+				if ( $purchase_note = get_post_meta( $item['product_id'], '_purchase_note', true ) ) {
+					$meta_data[] = array(
+						'key'	=> __( 'Note', 'receiptful' ),
+						'value'	=> $purchase_note,
+					);
+				}
 
 
-				$inc_tax = 'incl' == $order->tax_display_cart ? true : false;
+				$inc_tax 		= 'incl' == $order->tax_display_cart ? true : false;
 				$product_amount = $order->get_line_subtotal( $item, $inc_tax, false ) / $item['qty'];
 
 				$items[] = array(
@@ -321,7 +325,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			// Shipping
 			if ( $order->order_shipping > 0 ) {
 				$shipping_total = 'excl' == $tax_display ? $order->order_shipping : ( $order->order_shipping + $order->order_shipping_tax );
-				$subtotals[] = array( 'description' => __( 'Shipping', 'receiptful' ), 'amount' => number_format( (float) $shipping_total, 2, '.', '' ) );
+				$subtotals[] = array( 'description' => $order->get_shipping_method(), 'amount' => number_format( (float) $shipping_total, 2, '.', '' ) );
 			}
 
 			// Fees
@@ -379,7 +383,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			$related_product_ids	= $product->get_related( 2 );
 
 			// Fallback to random products when no related were found.
-			if ( empty ( $related_product_ids ) ) {
+			if ( empty( $related_product_ids ) ) {
 				$related_product_ids = wc_get_random_products( 2 );
 			}
 
@@ -470,6 +474,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 					'postcode'		=> $order->shipping_postcode,
 					'country'		=> $order->shipping_country,
 				),
+				'notes'				=> $order->customer_message,
 			);
 
 			if ( 'incl' == $order->tax_display_cart ) {

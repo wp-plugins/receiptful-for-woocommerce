@@ -74,7 +74,7 @@ class Receiptful_Admin {
 	 */
 	public function settings_tab( $tabs ) {
 
-		$tabs['receiptful'] = __( 'Receiptful', 'woocommerce-receiptful' );
+		$tabs['receiptful'] = __( 'Receiptful', 'receiptful' );
 
 		return $tabs;
 
@@ -95,13 +95,13 @@ class Receiptful_Admin {
 		$settings = apply_filters( 'woocommerce_receiptful_settings', array(
 
 			array(
-				'title'		=> __( 'Receiptful General', 'woocommerce-receiptful' ),
+				'title'		=> __( 'Receiptful General', 'receiptful' ),
 				'type'		=> 'title',
 				'desc'		=> sprintf(__("To get started with Receiptful, please add your API key (<a href='%s' target='_blank'>which you can find here</a>) and save the settings.", 'receiptful'), $this->receiptful_profile_url),
 				'id'		=> 'receiptful_general',
 			),
 			array(
-				'title'		=> __( 'API Key', 'woocommerce-receiptful' ),
+				'title'		=> __( 'API Key', 'receiptful' ),
 				'desc'		=> '',
 				'id'		=> 'receiptful_api_key',
 				'default'	=> '',

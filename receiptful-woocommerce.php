@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.1.1
+ * Version: 1.1.2
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.1';
+	public $version = '1.1.2';
 
 
 	/**
@@ -196,8 +196,11 @@ class Receiptful_WooCommerce {
 	 */
 	public function load_textdomain() {
 
+		$locale = apply_filters( 'plugin_locale', get_locale(), 'receiptful' );
+
 		// Load textdomain
-		load_plugin_textdomain( 'woocommerce-receiptful', false, basename( dirname( __FILE__ ) ) . '/languages' );
+		load_textdomain( 'receiptful', WP_LANG_DIR . '/receiptful-for-woocommerce/receiptful-' . $locale . '.mo' );
+		load_plugin_textdomain( 'receiptful', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 	}
 

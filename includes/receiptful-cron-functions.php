@@ -44,15 +44,24 @@ add_filter( 'cron_schedules', 'receiptful_add_quarter_schedule' );
  */
 function receiptful_schedule_event() {
 
+	// Resend queue
 	if ( ! wp_next_scheduled( 'receiptful_check_resend' ) ) {
 		wp_schedule_event( 1407110400, 'quarter_hour', 'receiptful_check_resend' ); // 1407110400 is 08 / 4 / 2014 @ 0:0:0 UTC
 	}
 
+	// Initial product sync
 	if ( ! wp_next_scheduled( 'receiptful_initial_product_sync' ) && 1 != get_option( 'receiptful_completed_initial_product_sync', 0 ) ) {
 		wp_schedule_event( 1407110400, 'quarter_hour', 'receiptful_initial_product_sync' ); // 1407110400 is 08 / 4 / 2014 @ 0:0:0 UTC
 	} elseif ( wp_next_scheduled( 'receiptful_initial_product_sync' ) && 1 == get_option( 'receiptful_completed_initial_product_sync', 0 ) ) {
 		// Remove CRON when we're done with it.
 		wp_clear_scheduled_hook( 'receiptful_initial_product_sync' );
+	}
+
+	// Initial receipt sync
+	if ( ! wp_next_scheduled( 'receiptful_initial_receipt_sync' ) && 1 != get_option( 'receiptful_completed_initial_receipt_sync', 0 ) ) {
+		wp_schedule_event( 1407110400, 'quarter_hour', 'receiptful_initial_receipt_sync' ); // 1407110400 is 08 / 4 / 2014 @ 0:0:0 UTC
+	} elseif ( wp_next_scheduled( 'receiptful_initial_receipt_sync' ) && 1 == get_option( 'receiptful_completed_initial_receipt_sync', 0 ) ) {
+		wp_clear_scheduled_hook( 'receiptful_initial_receipt_sync' ); // Remove CRON when we're done with it.
 	}
 
 }
@@ -104,7 +113,7 @@ function receiptful_initial_product_sync() {
 	) );
 
 	// Update option so the system knows it should stop syncing
-	if ( empty ( $product_ids ) ) {
+	if ( empty( $product_ids ) ) {
 		update_option( 'receiptful_completed_initial_product_sync', 1 );
 		return;
 	}
@@ -152,3 +161,92 @@ function receiptful_initial_product_sync() {
 
 }
 add_action( 'receiptful_initial_product_sync', 'receiptful_initial_product_sync' );
+
+
+/**
+ * Sync Receipt data.
+ *
+ * Sync data with the Receiptful API, this contains products for now.
+ * The products are synced with Receiptful to give the best product recommendations.
+ * This is a initial product sync, the process should be completed once.
+ *
+ * @since 1.1.2
+ */
+function receiptful_initial_receipt_sync() {
+
+	$receipt_ids = get_posts( array(
+		'fields'			=> 'ids',
+		'posts_per_page'	=> '225',
+		'post_type'			=> 'shop_order',
+		'post_status'		=> array_keys( wc_get_order_statuses() ),
+		'meta_query'		=> array(
+			array(
+				'key'		=> '_receiptful_last_update',
+				'compare'	=> 'NOT EXISTS',
+				'value'		=> '',
+			),
+			array(
+				'key'		=> '_receiptful_receipt_id',
+				'compare'	=> 'NOT EXISTS',
+				'value'		=> '',
+			),
+		),
+	) );
+
+	// Update option so the system knows it should stop syncing
+	if ( empty( $receipt_ids ) ) {
+		update_option( 'receiptful_completed_initial_receipt_sync', 1 );
+		return;
+	}
+
+	// Prepare product args
+	$args = array();
+	foreach ( $receipt_ids as $receipt_id ) {
+
+		$order				= wc_get_order( $receipt_id );
+		$items 				= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_items( $order );
+		$subtotals 			= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_subtotals( $order );
+		$related_products 	= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_related_products( $items );
+		$order_args 		= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_order_args( $order, $items, $subtotals, $related_products );
+
+		$args[] = $order_args;
+
+	}
+
+	// Update products
+	$response = Receiptful()->api->upload_receipts( $args );
+
+	// Process response
+	if ( is_wp_error( $response ) ) {
+
+		return false;
+
+	} elseif ( in_array( $response['response']['code'], array( '400' ) ) ) {
+
+		// Set empty update time, so its not retried at next CRON job
+		foreach ( $receipt_ids as $receipt_id ) {
+			update_post_meta( $receipt_id, '_receiptful_last_update', '' );
+		}
+
+	} elseif ( in_array( $response['response']['code'], array( '200', '202' ) ) ) { // Update only the ones without error - retry the ones with error
+
+		$failed_ids = array();
+		$body 		= json_decode( $response['body'], 1 );
+		foreach ( $body['errors'] as $error ) {
+			$failed_ids[] = isset( $error['error']['product_id'] ) ? $error['error']['product_id'] : null;
+		}
+
+		// Set empty update time, so its not retried at next CRON job
+		foreach ( $receipt_ids as $receipt_id ) {
+			if ( ! in_array( $receipt_id, $failed_ids ) ) {
+				update_post_meta( $receipt_id, '_receiptful_last_update', time() );
+			} else {
+				update_post_meta( $receipt_id, '_receiptful_last_update', '' );
+			}
+		}
+
+	} elseif ( in_array( $response['response']['code'], array( '401', '500', '503' ) ) ) { // Retry later - keep meta unset
+	}
+
+}
+add_action( 'receiptful_initial_receipt_sync', 'receiptful_initial_receipt_sync' );
