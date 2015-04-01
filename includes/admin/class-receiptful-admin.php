@@ -12,17 +12,20 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 class Receiptful_Admin {
 
+
 	/**
 	 * URL for the store owner's Profile page in the Receiptful app.
 	 * @var string
 	 */
 	public $receiptful_profile_url = 'https://app.receiptful.com/profile';
 
+
 	/**
 	 * URL for the store owner's Template in the Receiptful app.
 	 * @var string
 	 */
 	public $receiptful_template_url = 'https://app.receiptful.com/template';
+
 
 	/**
 	 * URL for the store owner's Dashboard in the Receiptful app.
@@ -74,7 +77,7 @@ class Receiptful_Admin {
 	 */
 	public function settings_tab( $tabs ) {
 
-		$tabs['receiptful'] = __( 'Receiptful', 'receiptful' );
+		$tabs['receiptful'] = 'Receiptful';
 
 		return $tabs;
 
@@ -97,7 +100,7 @@ class Receiptful_Admin {
 			array(
 				'title'		=> __( 'Receiptful General', 'receiptful' ),
 				'type'		=> 'title',
-				'desc'		=> sprintf(__("To get started with Receiptful, please add your API key (<a href='%s' target='_blank'>which you can find here</a>) and save the settings.", 'receiptful'), $this->receiptful_profile_url),
+				'desc'		=> sprintf( __( "To get started with Receiptful, please add your API key (<a href='%s' target='_blank'>which you can find here</a>) and save the settings.", 'receiptful' ), $this->receiptful_profile_url ),
 				'id'		=> 'receiptful_general',
 			),
 			array(
@@ -115,8 +118,7 @@ class Receiptful_Admin {
 			array(
 				'title'		=> '',
 				'type'		=> 'title',
-				'desc'		=> sprintf(__("<a href='%s'>Edit My Template</a> | <a href='%s'>View Statistics</a>", 'receiptful'),
-								$this->receiptful_template_url, $this->receiptful_stats_url),
+				'desc'		=> sprintf( __( "<a href='%s'>Edit My Template</a> | <a href='%s'>View Statistics</a>", 'receiptful' ),	$this->receiptful_template_url, $this->receiptful_stats_url ),
 				'id'		=> 'receiptful_links',
 			),
 			array(

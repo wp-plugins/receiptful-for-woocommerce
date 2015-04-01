@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Receiptful for WooCommerce\n"
-"POT-Creation-Date: 2015-03-11 16:08+0100\n"
-"PO-Revision-Date: 2015-03-11 16:08+0100\n"
+"POT-Creation-Date: 2015-03-16 09:33+0100\n"
+"PO-Revision-Date: 2015-03-16 09:33+0100\n"
 "Last-Translator: \n"
 "Language-Team: Receiptful\n"
 "Language: en\n"
@@ -14,6 +14,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-KeywordsList: __;_e;_x\n"
 "X-Poedit-SearchPath-0: ..\n"
+"X-Poedit-SearchPathExcluded-0: ../tests\n"
 
 #: ../includes/admin/class-receiptful-admin.php:77
 msgid "Receiptful"
@@ -66,43 +67,43 @@ msgstr ""
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:106
 #, php-format
 msgid ""
-"Error sending customer receipt via Receiptful. <br/> Error Message: %s. <br/> "
+"Error sending customer receipt via Receiptful. <br/> Error Message: %1$s. "
 "Receipt added to resend queue."
 msgstr ""
 
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:128
 #, php-format
 msgid ""
-"Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error "
-"Message: %2$s. Receipt added to resend queue."
+"Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> "
+"Error Message: %2$s. Receipt added to resend queue."
 msgstr ""
 
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:137
 #, php-format
 msgid ""
-"Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error "
-"Message: %2$s."
+"Error sending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> "
+"Error Message: %2$s."
 msgstr ""
 
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:166
 #, php-format
 msgid ""
-"Error resending customer receipt via Receiptful. <br/> Error Message: %s. <br/> "
-"Receipt added to resend queue."
+"Error resending customer receipt via Receiptful. <br/> Error Message: %1$s. "
+"<br/> Receipt added to resend queue."
 msgstr ""
 
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:180
 #, php-format
 msgid ""
-"Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error "
-"Message: %2$s. Receipt added to resend queue."
+"Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/"
+"> Error Message: %2$s. <br/> Receipt added to resend queue."
 msgstr ""
 
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:189
 #, php-format
 msgid ""
-"Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/> Error "
-"Message: %2$s."
+"Error resending customer receipt via Receiptful. <br/> Error Code: %1$s <br/"
+"> Error Message: %2$s."
 msgstr ""
 
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:271
@@ -117,12 +118,7 @@ msgstr ""
 msgid "Discount"
 msgstr ""
 
-#: ../includes/emails/class-receiptful-email-customer-new-order.php:328
-msgid "Shipping"
-msgstr ""
-
 #: ../includes/emails/class-receiptful-email-customer-new-order.php:438
-#: ../tests/unit-tests/api.php:55
 msgid "#"
 msgstr ""
 
@@ -143,17 +139,10 @@ msgstr ""
 #: ../receiptful-woocommerce.php:294
 msgid ""
 "Receiptful has been activated. Please click <a href=\"admin.php?page=wc-"
-"settings&tab=receiptful\">here</a> to add your API key & supercharge your receipts."
+"settings&tab=receiptful\">here</a> to add your API key & supercharge your "
+"receipts."
 msgstr ""
 
 #: ../receiptful-woocommerce.php:320
 msgid "Settings"
-msgstr ""
-
-#: ../tests/framework/factories/class-wc-unit-test-factory-for-webhook-delivery.php:22
-msgid "WooCommerce"
-msgstr ""
-
-#: ../tests/unit-tests/emails/new-order-email.php:275
-msgid "Size"
 msgstr ""

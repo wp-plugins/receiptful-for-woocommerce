@@ -144,7 +144,7 @@ function receiptful_initial_product_sync() {
 		$failed_ids = array();
 		$body 		= json_decode( $response['body'], 1 );
 		foreach ( $body['errors'] as $error ) {
-			$failed_ids[] = $error['error']['product_id'];
+			$failed_ids[] = isset( $error['error']['product_id'] ) ? $error['error']['product_id'] : null;
 		}
 
 		// Set empty update time, so its not retried at next CRON job
@@ -206,8 +206,7 @@ function receiptful_initial_receipt_sync() {
 		$order				= wc_get_order( $receipt_id );
 		$items 				= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_items( $order );
 		$subtotals 			= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_subtotals( $order );
-		$related_products 	= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_related_products( $items );
-		$order_args 		= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_order_args( $order, $items, $subtotals, $related_products );
+		$order_args 		= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_order_args( $order, $items, $subtotals, $related_products = array() );
 
 		$args[] = $order_args;
 
@@ -233,7 +232,7 @@ function receiptful_initial_receipt_sync() {
 		$failed_ids = array();
 		$body 		= json_decode( $response['body'], 1 );
 		foreach ( $body['errors'] as $error ) {
-			$failed_ids[] = isset( $error['error']['product_id'] ) ? $error['error']['product_id'] : null;
+			$failed_ids[] = isset( $error['error']['reference'] ) ? $error['error']['reference'] : null;
 		}
 
 		// Set empty update time, so its not retried at next CRON job

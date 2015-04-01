@@ -127,8 +127,8 @@ class Receiptful_Products {
 	 *
 	 * @since 1.1.1
 	 *
-	 * @param	int		ID of the product to update.
-	 * @return	array	Formatted array according Receiptful standards with product data.
+	 * @param	int		$product_id	ID of the product to update.
+	 * @return	array				Formatted array according Receiptful standards with product data.
 	 */
 	public function get_formatted_product( $product_id ) {
 
@@ -153,7 +153,7 @@ class Receiptful_Products {
 			'tags'			=> $tags,
 			'categories'	=> $categories,
 			'variants'		=> $variants,
-		) );
+		), $product->id );
 
 		return $args;
 

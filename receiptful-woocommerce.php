@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.1.2
+ * Version: 1.1.3
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.2';
+	public $version = '1.1.3';
 
 
 	/**
@@ -255,7 +255,7 @@ class Receiptful_WooCommerce {
 
 			$coupon_id					= wc_get_coupon_by_code( $coupon );
 			$is_receiptful_coupon		= get_post_meta( $coupon_id, 'receiptful_coupon', true );
-			$coupon_code				= strtoupper( $coupon );
+			$coupon_code				= esc_js( strtoupper( $coupon ) );
 
 			if ( 'yes' == $is_receiptful_coupon ) {
 				$coupon_tracking_code = "Receiptful.conversion.couponCode = '$coupon_code';";
@@ -264,9 +264,9 @@ class Receiptful_WooCommerce {
 		}
 
 		?><script>
-			Receiptful.conversion.reference = '<?php echo $order->id; ?>';
-			Receiptful.conversion.amount	= <?php echo $order->get_total(); ?>;
-			Receiptful.conversion.currency	= '<?php echo $order->get_order_currency(); ?>';
+			Receiptful.conversion.reference = '<?php echo esc_js( $order->id ); ?>';
+			Receiptful.conversion.amount	= <?php echo esc_js( $order->get_total() ); ?>;
+			Receiptful.conversion.currency	= '<?php echo esc_js( $order->get_order_currency() ); ?>';
 			<?php echo $coupon_tracking_code; ?>
 			Receiptful.trackConversion();
 		</script><?php

@@ -172,7 +172,8 @@ class Receiptful_Email {
 
 		} elseif ( 'shippingcoupon' == $data['upsellType'] ) {
 
-			$shipping_coupon = 'yes';
+			$shipping_coupon 	= 'yes';
+			$data['amount']		= '';
 
 		}
 
@@ -248,7 +249,7 @@ class Receiptful_Email {
 	public function view_receipt_button( $actions, $order ) {
 
 		$receipt_id				= get_post_meta( $order->id, '_receiptful_receipt_id', true );
-		$receiptful_web_link	= get_post_meta( $order->id, '_receiptful_web_link', true);
+		$receiptful_web_link	= get_post_meta( $order->id, '_receiptful_web_link', true );
 
 		if ( $receipt_id && $receiptful_web_link ){
 			// Id exists so remove old View button and add Receiptful button

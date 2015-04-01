@@ -3,7 +3,7 @@ Contributors: receiptful
 Tags: receiptful, receiptful woocommerce, receipt, receipts, invoice, email, order confirmation, order mail, ecommerce mail
 Requires at least: 3.6.0
 Tested up to: 4.1
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,14 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 
 == Changelog ==
+
+= 1.1.3 - 01/04/2015 =
+
+* [Fix] - Typo in filter name 'receiptful_api_args_related_products'
+* [Improvement] - Prevent shipping coupons from having discount amounts
+* [Improvement] - Prevent getting related products in the initial product sync
+* [Improvement] - Automatically picking up Tax/totals translation from WooCommerce
+* [Improvement] - Prevent notice when API doesn't return the 'products' parameter
 
 = 1.1.2 - 12/03/2015 =
 

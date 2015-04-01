@@ -1,5 +1,12 @@
 *** Receiptful for WooCommerce ***
 
+2015-04-01 Version 1.1.3
+* [Fix] - Typo in filter name 'receiptful_api_args_related_products'
+* [Improvement] - Prevent shipping coupons from having discount amounts
+* [Improvement] - Prevent getting related products in the initial product sync
+* [Improvement] - Automatically picking up Tax/totals translation from WooCommerce
+* [Improvement] - Prevent notice when API doesn't return the 'products' parameter
+
 2015-03-12 Version 1.1.2
 * [Add] - Receipt sync for better recommendations
 * [Add] - Order note support
