@@ -1,16 +1,17 @@
-<?PHP
+<?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Class WC_Receiptful_Admin.
+ * Class Receiptful_Admin.
  *
  * Admin class.
  *
- * @class       WC_Receiptful_Admin
- * @version     1.0.0
- * @author      Receiptful
+ * @class		Receiptful_Admin
+ * @version		1.0.0
+ * @author		Receiptful
  */
-class WC_Receiptful_Admin {
+class Receiptful_Admin {
+
 
 	/**
 	 * URL for the store owner's Profile page in the Receiptful app.
@@ -18,11 +19,13 @@ class WC_Receiptful_Admin {
 	 */
 	public $receiptful_profile_url = 'https://app.receiptful.com/profile';
 
+
 	/**
 	 * URL for the store owner's Template in the Receiptful app.
 	 * @var string
 	 */
 	public $receiptful_template_url = 'https://app.receiptful.com/template';
+
 
 	/**
 	 * URL for the store owner's Dashboard in the Receiptful app.
@@ -54,7 +57,7 @@ class WC_Receiptful_Admin {
 		add_filter( 'woocommerce_settings_tabs_array', array( $this, 'settings_tab' ), 60 );
 
 		// Settings page contents
-		add_action( 'woocommerce_settings_tabs_receiptful', array( $this, 'settings_page' ) );
+		add_action( 'woocommerce_settings_receiptful', array( $this, 'settings_page' ) );
 
 		// Save settings page
 		add_action( 'woocommerce_update_options_receiptful', array( $this, 'update_options' ) );
@@ -69,12 +72,12 @@ class WC_Receiptful_Admin {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param 	array	$tabs 	Array of default tabs used in WC.
-	 * @return 	array 			All WC settings tabs including newly added.
+	 * @param	array	$tabs	Array of default tabs used in WC.
+	 * @return	array			All WC settings tabs including newly added.
 	 */
 	public function settings_tab( $tabs ) {
 
-		$tabs['receiptful'] = __( 'Receiptful', 'woocommerce-receiptful' );
+		$tabs['receiptful'] = 'Receiptful';
 
 		return $tabs;
 
@@ -95,33 +98,32 @@ class WC_Receiptful_Admin {
 		$settings = apply_filters( 'woocommerce_receiptful_settings', array(
 
 			array(
-				'title' 	=> __( 'Receiptful General', 'woocommerce-receiptful' ),
-				'type' 		=> 'title',
-				'desc' 		=> sprintf(__("To get started with Receiptful, please add your API key (<a href='%s' target='_blank'>which you can find here</a>) and save the settings.", 'receiptful'), $this->receiptful_profile_url),
+				'title'		=> __( 'Receiptful General', 'receiptful' ),
+				'type'		=> 'title',
+				'desc'		=> sprintf( __( "To get started with Receiptful, please add your API key (<a href='%s' target='_blank'>which you can find here</a>) and save the settings.", 'receiptful' ), $this->receiptful_profile_url ),
 				'id'		=> 'receiptful_general',
 			),
 			array(
-				'title'   	=> __( 'API Key', 'woocommerce-receiptful' ),
-				'desc' 	  	=> __( '', 'woocommerce-receiptful' ),
-				'id' 	  	=> 'receiptful_api_key',
-				'default' 	=> '',
-				'type' 	  	=> 'text',
+				'title'		=> __( 'API Key', 'receiptful' ),
+				'desc'		=> '',
+				'id'		=> 'receiptful_api_key',
+				'default'	=> '',
+				'type'		=> 'text',
 				'autoload'	=> false
 			),
 			array(
-				'type' 		=> 'sectionend',
-				'id' 		=> 'receiptful_end'
+				'type'		=> 'sectionend',
+				'id'		=> 'receiptful_end'
 			),
 			array(
-				'title' 	=> '',
-				'type' 		=> 'title',
-				'desc' 		=> sprintf(__("<a href='%s'>Edit My Template</a> | <a href='%s'>View Statistics</a>", 'receiptful'),
-								$this->receiptful_template_url, $this->receiptful_stats_url),
-				'id'		=> 'receiptful_general',
+				'title'		=> '',
+				'type'		=> 'title',
+				'desc'		=> sprintf( __( "<a href='%s'>Edit My Template</a> | <a href='%s'>View Statistics</a>", 'receiptful' ),	$this->receiptful_template_url, $this->receiptful_stats_url ),
+				'id'		=> 'receiptful_links',
 			),
 			array(
-				'type' 		=> 'sectionend',
-				'id' 		=> 'receiptful_end'
+				'type'		=> 'sectionend',
+				'id'		=> 'receiptful_end'
 			),
 
 		) );
