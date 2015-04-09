@@ -5,7 +5,7 @@
  * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: Receiptful
  * Author URI: http://receiptful.com
- * Version: 1.1.3
+ * Version: 1.1.4
  * Text Domain: receiptful
  * Domain Path: /languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.3';
+	public $version = '1.1.4';
 
 
 	/**
