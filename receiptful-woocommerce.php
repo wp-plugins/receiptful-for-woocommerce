@@ -138,6 +138,12 @@ class Receiptful_WooCommerce {
 		$this->email = new Receiptful_Email();
 
 		/**
+		 * Front end class
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/class-receiptful-front-end.php';
+		$this->front_end = new Receiptful_Front_End();
+
+		/**
 		 * Receiptful API
 		 */
 		require_once plugin_dir_path( __FILE__ ) . '/includes/class-receiptful-api.php';
@@ -230,7 +236,13 @@ class Receiptful_WooCommerce {
 	public function print_scripts() {
 
 		if ( ! is_checkout() || ( is_checkout() && ! isset( $_GET['order-received'] ) ) ) {
-			?><script type='text/javascript'>Receiptful.setTrackingCookie();</script><?php
+			?><script type='text/javascript'>
+				document.addEventListener('DOMContentLoaded', function(event) {
+					if ( typeof Receiptful !== 'undefined' ) {
+						Receiptful.setTrackingCookie();
+					}
+				});
+			</script><?php
 		}
 
 	}
@@ -263,12 +275,16 @@ class Receiptful_WooCommerce {
 
 		}
 
-		?><script>
-			Receiptful.conversion.reference = '<?php echo esc_js( $order->id ); ?>';
-			Receiptful.conversion.amount	= <?php echo esc_js( $order->get_total() ); ?>;
-			Receiptful.conversion.currency	= '<?php echo esc_js( $order->get_order_currency() ); ?>';
-			<?php echo $coupon_tracking_code; ?>
-			Receiptful.trackConversion();
+		?><script type='text/javascript'>
+			document.addEventListener('DOMContentLoaded', function(event) {
+				if ( typeof Receiptful !== 'undefined' ) {
+					Receiptful.conversion.reference = '<?php echo esc_js( $order->id ); ?>';
+					Receiptful.conversion.amount	= <?php echo esc_js( $order->get_total() ); ?>;
+					Receiptful.conversion.currency	= '<?php echo esc_js( $order->get_order_currency() ); ?>';
+					<?php echo $coupon_tracking_code; ?>
+					Receiptful.trackConversion();
+				}
+			});
 		</script><?php
 
 	}

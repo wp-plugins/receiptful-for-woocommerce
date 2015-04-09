@@ -62,6 +62,9 @@ class Receiptful_Admin {
 		// Save settings page
 		add_action( 'woocommerce_update_options_receiptful', array( $this, 'update_options' ) );
 
+		// Remove public key when API key gets changed (will be gotten automatically)
+		add_action( 'update_option_receiptful_api_key', array( $this, 'delete_public_key' ), 10, 2 );
+
 	}
 
 
@@ -157,6 +160,20 @@ class Receiptful_Admin {
 	public function update_options() {
 
 		WC_Admin_Settings::save_fields( $this->get_settings() );
+
+	}
+
+
+	/**
+	 * Delete public key.
+	 *
+	 * Delete the public key when the API key gets updated.
+	 *
+	 * @since 1.1.4
+	 */
+	public function delete_public_key( $old_value, $value ) {
+
+		delete_option( 'receiptful_public_user_key' );
 
 	}
 
