@@ -178,24 +178,26 @@ class Receiptful_Email {
 		}
 
 		$coupon_data = apply_filters( 'receiptful_coupon_data', array(
-			'type'							=> $discount_type,
-			'amount'						=> isset( $data['amount'] ) ? wc_clean( $data['amount'] ) : '',
+			'discount_type'					=> $discount_type,
+			'coupon_amount'					=> wc_format_decimal( isset( $data['amount'] ) ? wc_clean( $data['amount'] ) : '' ),
 			'individual_use'				=> 'yes',
 			'product_ids'					=> '',
-			'exclude_product_ids'			=> array(),
+			'exclude_product_ids'			=> '',
 			'usage_limit'					=> '1',
 			'usage_limit_per_user'			=> '1',
 			'limit_usage_to_x_items'		=> '',
-			'usage_count'					=> '',
-			'expiry_date'					=> $expiry_date,
+			'usage_count'					=> '0',
+			'expiry_date'					=> wc_clean( $expiry_date ),
 			'apply_before_tax'				=> 'yes',
-			'free_shipping'					=> $shipping_coupon,
+			'free_shipping'					=> wc_clean( $shipping_coupon ),
 			'product_categories'			=> array(),
 			'exclude_product_categories'	=> array(),
 			'exclude_sale_items'			=> 'no',
 			'minimum_amount'				=> '',
 			'maximum_amount'				=> '',
-			'customer_email'				=> ! empty( $data['emailLimit'] ) ? array( $order->billing_email ) : array(),
+			'customer_email'				=> ! empty( $data['emailLimit'] ) ? array( sanitize_email( $order->billing_email ) ) : array(),
+			'receiptful_coupon'				=> 'yes',
+			'receiptful_coupon_order'		=> $order_id,
 		), $order_id, $data );
 
 		$new_coupon = array(
@@ -209,26 +211,9 @@ class Receiptful_Email {
 		$id = wp_insert_post( $new_coupon );
 
 		// set coupon meta
-		update_post_meta( $id, 'discount_type', $coupon_data['type'] );
-		update_post_meta( $id, 'coupon_amount', wc_format_decimal( $coupon_data['amount'] ) );
-		update_post_meta( $id, 'individual_use', $coupon_data['individual_use'] );
-		update_post_meta( $id, 'product_ids', '' );
-		update_post_meta( $id, 'exclude_product_ids', implode( ',', array_filter( array_map( 'intval', $coupon_data['exclude_product_ids'] ) ) ) );
-		update_post_meta( $id, 'usage_limit', absint( $coupon_data['usage_limit'] ) );
-		update_post_meta( $id, 'usage_limit_per_user', absint( $coupon_data['usage_limit_per_user'] ) );
-		update_post_meta( $id, 'limit_usage_to_x_items', absint( $coupon_data['limit_usage_to_x_items'] ) );
-		update_post_meta( $id, 'usage_count', absint( $coupon_data['usage_count'] ) );
-		update_post_meta( $id, 'expiry_date', wc_clean( $coupon_data['expiry_date'] ) );
-		update_post_meta( $id, 'apply_before_tax', wc_clean( $coupon_data['apply_before_tax'] ) );
-		update_post_meta( $id, 'free_shipping', wc_clean( $coupon_data['free_shipping'] ) );
-		update_post_meta( $id, 'product_categories', array_filter( array_map( 'intval', $coupon_data['product_categories'] ) ) );
-		update_post_meta( $id, 'exclude_product_categories', array_filter( array_map( 'intval', $coupon_data['exclude_product_categories'] ) ) );
-		update_post_meta( $id, 'exclude_sale_items', wc_clean( $coupon_data['exclude_sale_items'] ) );
-		update_post_meta( $id, 'minimum_amount', wc_format_decimal( $coupon_data['minimum_amount'] ) );
-		update_post_meta( $id, 'maximum_amount', wc_format_decimal( $coupon_data['maximum_amount'] ) );
-		update_post_meta( $id, 'customer_email', array_filter( array_map( 'sanitize_email', $coupon_data['customer_email'] ) ) );
-		update_post_meta( $id, 'receiptful_coupon', 'yes' );
-		update_post_meta( $id, 'receiptful_coupon_order', $order_id );
+		foreach ( $coupon_data as $key => $value ) {
+			update_post_meta( $id, $key, $value );
+		}
 
 		return $id;
 

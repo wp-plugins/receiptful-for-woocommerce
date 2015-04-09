@@ -430,8 +430,6 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			// These values are added to the order at checkout if available.
 			// If not recorded then empty string will be sent.
 			$payment_method	= get_post_meta( $order->id, '_payment_method_title', true );
-			$last4			= isset( $order->receiptful_last4 )			? $order->receiptful_last4			: '';
-			$customer_ip	= isset( $order->receitpful_customer_ip )	? $order->receitpful_customer_ip	: '';
 
 			$order_args = array(
 				'date'			=> date_i18n( 'c', strtotime( get_post_field( 'post_date', $order->id ) ) ),
@@ -442,12 +440,11 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				'from'			=> $this->get_from_address(),
 				'payment'		=> array(
 					'type'	=> $payment_method,
-					'last4'	=> $last4
 				),
 				'items'			=> $items,
 				'subtotals'		=> $subtotals,
 				'upsell'		=> array( 'products' => $related_products ),
-				'customerIp'	=> $customer_ip,
+				'customerIp'	=> '',
 				'billing'		=> array(
 					'address'	=> array(
 						'firstName'		=> $order->billing_first_name,
