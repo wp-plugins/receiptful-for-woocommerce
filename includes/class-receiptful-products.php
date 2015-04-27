@@ -143,11 +143,21 @@ class Receiptful_Products {
 		$tags		= wp_get_post_terms( $product->id, 'product_tag', array( 'fields' => 'names' ) );
 		$variants	= $this->get_formatted_variants( $product->id );
 
+		if ( 'publish' != $product->post->post_status ) :
+			$hidden = true;
+		elseif ( 'hidden' == get_post_meta( $product_id, '_visibility', true ) ) :
+			$hidden = true;
+		elseif ( ! empty( $product->post->post_password ) ) :
+			$hidden = true;
+		else :
+			$hidden = false;
+		endif;
+
 		$args = apply_filters( 'receiptful_update_product_args', array(
 			'product_id'	=> (string) $product->id,
 			'title'			=> $product->get_title(),
-			'description'	=> $product->post->post_content,
-			'hidden'		=> 'draft' == $product->post->post_status ? true : false,
+			'description'	=> strip_shortcodes( $product->post->post_content ),
+			'hidden'		=> $hidden,
 			'url'			=> get_permalink( $product->id ),
 			'images'		=> $images,
 			'tags'			=> $tags,

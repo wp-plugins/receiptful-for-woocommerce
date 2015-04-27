@@ -103,11 +103,19 @@ function receiptful_initial_product_sync() {
 		'fields'			=> 'ids',
 		'posts_per_page'	=> '225',
 		'post_type'			=> 'product',
+		'has_password'		=> false,
+		'post_status'		=> 'publish',
 		'meta_query'		=> array(
+			'relation' 		=> 'AND',
 			array(
 				'key'		=> '_receiptful_last_update',
 				'compare'	=> 'NOT EXISTS',
 				'value'		=> '',
+			),
+			array(
+				'key'		=> '_visibility',
+				'compare'	=> '!=',
+				'value'		=> 'hidden',
 			),
 		),
 	) );

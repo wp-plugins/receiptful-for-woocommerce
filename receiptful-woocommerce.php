@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Receiptful for WooCommerce
- * Plugin URI: http://receiptful.com
- * Description: Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
- * Author: Receiptful
- * Author URI: http://receiptful.com
- * Version: 1.1.4
- * Text Domain: receiptful
- * Domain Path: /languages/
+ * Plugin Name: 	Receiptful for WooCommerce
+ * Plugin URI: 		http://receiptful.com
+ * Description: 	Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
+ * Author: 			Receiptful
+ * Author URI: 		http://receiptful.com
+ * Version: 		1.1.5
+ * Text Domain: 	receiptful
+ * Domain Path: 	/languages/
  *
  * @package		Receiptful-WooCommerce
  * @author		Receiptful
@@ -160,6 +160,11 @@ class Receiptful_WooCommerce {
 		 */
 		require_once plugin_dir_path( __FILE__ ) . '/includes/integrations/woocommerce-subscriptions.php';
 
+		/**
+		 * WPML Compatibility
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/integrations/wpml.php';
+
 	}
 
 
@@ -278,7 +283,7 @@ class Receiptful_WooCommerce {
 		?><script type='text/javascript'>
 			document.addEventListener('DOMContentLoaded', function(event) {
 				if ( typeof Receiptful !== 'undefined' ) {
-					Receiptful.conversion.reference = '<?php echo esc_js( $order->id ); ?>';
+					Receiptful.conversion.reference = '<?php echo esc_js( ltrim( $order->get_order_number(), _x( '#', 'hash before order number', 'receiptful' ) ) ); ?>';
 					Receiptful.conversion.amount	= <?php echo esc_js( $order->get_total() ); ?>;
 					Receiptful.conversion.currency	= '<?php echo esc_js( $order->get_order_currency() ); ?>';
 					<?php echo $coupon_tracking_code; ?>
