@@ -73,7 +73,7 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Changelog ==
 
-= 1.1.5 - 20/05/2015 =
+= 1.1.6 - 19/05/2015 =
 
 * [Add] - Add recommendation options
 * [Add] - Page tracking
