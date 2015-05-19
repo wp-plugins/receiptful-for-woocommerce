@@ -149,6 +149,8 @@ class Receiptful_Products {
 			$hidden = true;
 		elseif ( ! empty( $product->post->post_password ) ) :
 			$hidden = true;
+		elseif ( 'outofstock' === $product->stock_status ) :
+			$hidden = true;
 		else :
 			$hidden = false;
 		endif;

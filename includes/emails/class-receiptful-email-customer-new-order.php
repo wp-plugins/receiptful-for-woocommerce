@@ -430,6 +430,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 			// These values are added to the order at checkout if available.
 			// If not recorded then empty string will be sent.
 			$payment_method	= get_post_meta( $order->id, '_payment_method_title', true );
+			$token			= get_post_meta( $order->id, '_receiptful_token', true );
 
 			$order_args = array(
 				'date'			=> date_i18n( 'c', strtotime( get_post_field( 'post_date', $order->id ) ) ),
@@ -472,6 +473,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 					'country'		=> $order->shipping_country,
 				),
 				'notes'				=> $order->customer_message,
+				'token'				=> $token,
 			);
 
 			// Amount notes

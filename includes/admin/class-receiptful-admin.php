@@ -35,6 +35,13 @@ class Receiptful_Admin {
 
 
 	/**
+	 * URL for the store owner's Dashboard in the Receiptful app.
+	 * @var string
+	 */
+	public $receiptful_recommendations_url = 'https://app.receiptful.com/recommendations';
+
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 1.0.0
@@ -123,6 +130,14 @@ class Receiptful_Admin {
 				'type'		=> 'title',
 				'desc'		=> sprintf( __( "<a href='%s'>Edit My Template</a> | <a href='%s'>View Statistics</a>", 'receiptful' ),	$this->receiptful_template_url, $this->receiptful_stats_url ),
 				'id'		=> 'receiptful_links',
+			),
+			array(
+				'title'   	=> __( 'Enable recommendations', 'woocommerce-advanced-messages' ),
+				'desc' 	  	=> sprintf( __( "Enable product recommendations. Requires to have set this up in the <a href='%s'>Recommendations section</a>.", 'receiptful' ), $this->receiptful_recommendations_url ),
+				'id' 	  	=> 'receiptful_enable_recommendations',
+				'default' 	=> 'no',
+				'type' 	  	=> 'checkbox',
+				'autoload'	=> false
 			),
 			array(
 				'type'		=> 'sectionend',

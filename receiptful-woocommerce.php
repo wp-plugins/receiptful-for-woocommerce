@@ -5,7 +5,7 @@
  * Description: 	Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: 			Receiptful
  * Author URI: 		http://receiptful.com
- * Version: 		1.1.5
+ * Version: 		1.1.6
  * Text Domain: 	receiptful
  * Domain Path: 	/languages/
  *
@@ -18,9 +18,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Class Receiptful_WooCommerce
+ * Class Receiptful_WooCommerce.
  *
- * Main class initializes the plugin
+ * Main class initializes the plugin.
  *
  * @class		Receiptful_WooCommerce
  * @version		1.0.0
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.4';
+	public $version = '1.1.6';
 
 
 	/**
@@ -156,6 +156,18 @@ class Receiptful_WooCommerce {
 		$this->products = new Receiptful_Products();
 
 		/**
+		 * Order functions
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/class-receiptful-order.php';
+		$this->order = new Receiptful_Order();
+
+		/**
+		 * Recommendation functions
+		 */
+		require_once plugin_dir_path( __FILE__ ) . '/includes/class-receiptful-recommendations.php';
+		$this->recommendations = new Receiptful_Recommendations();
+
+		/**
 		 * Subscription integration.
 		 */
 		require_once plugin_dir_path( __FILE__ ) . '/includes/integrations/woocommerce-subscriptions.php';
@@ -189,8 +201,6 @@ class Receiptful_WooCommerce {
 		// Tracking calls
 		add_action( 'wp_footer', array( $this, 'print_scripts' ), 99 );
 
-		// Track order
-		add_action( 'woocommerce_thankyou', array( $this, 'thank_you_tracking' ) );
 
 		// Helper functions
 		add_action( 'plugins_loaded', array( $this, 'load_helper_functions' ) );
@@ -259,10 +269,13 @@ class Receiptful_WooCommerce {
 	 * Track the click conversion on the order thank-you page.
 	 *
 	 * @since 1.0.2
+	 * @deprecated 1.1.6 Automatically tracked now.
 	 *
 	 * @param int $order_id ID of the order being completed.
 	 */
 	public function thank_you_tracking( $order_id ) {
+
+		return _deprecated_function( __METHOD__, '1.1.6' );
 
 		$order					= wc_get_order( $order_id );
 		$coupon_tracking_code	= '';
