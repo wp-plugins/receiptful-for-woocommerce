@@ -1,9 +1,9 @@
 === Receiptful for WooCommerce ===
 Contributors: receiptful
-Tags: woocommerce, receiptful, ecommerce, email
-Requires at least: 3.0.1
-Tested up to: 4.1
-Stable tag: 1.0.5
+Tags: receiptful, receiptful woocommerce, receipt, receipts, invoice, email, order confirmation, order mail, ecommerce mail
+Requires at least: 3.6.0
+Tested up to: 4.2
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,19 +13,19 @@ Receiptful replaces and supercharges the default WooCommerce receipts. Just acti
 
 = What you would experience =
 
-**Increased customer lifetime value**  
+**Increased customer lifetime value**
 We're sending out some beautiful emails combined with a good upsell for your customer. Offering a deal to your existing customers will increase their average lifetime!
 
-**Increasing revenue**  
+**Increasing revenue**
 Because the customer loved **your** service, and gets a great deal for their next order, they will soon order again! Giving you extra revenue.
 
-**Setup in less than 10 minutes**  
-As described below, setup is easy and quick! 10 minutes for increased revue? *Who wouldn't want that?!*
+**Setup in less than 10 minutes**
+As described below, setup is easy and quick! 10 minutes for increased revenue? *Who wouldn't want that?!*
 
-**Why FREE?**  
+**Why FREE?**
 You can read about why we made Receiptful free here: [Taking a Moonshot](https://receiptful.com/blog/taking-a-moonshot/)
 
-**Quick setup**  
+**Quick setup**
 Installing Receiptful is simple.
 
 1. Download & Activate this plugin
@@ -35,10 +35,12 @@ Installing Receiptful is simple.
 
 Simple huh?!
 
-**Need help?**  
+**Need help?**
 [Open a support ticket](https://wordpress.org/support/plugin/receiptful-for-woocommerce), We're here to make your life easier!
 
 **Please Note:** You require a Receiptful account ([sign up here for a 100% **FREE** account](http://receiptful.com))
+
+[youtube https://www.youtube.com/watch?v=ae3eG7CqUrA&modestbranding=1&controls=0&autohide=1&wmode=transparent&enablejsapi=1&html5=1&rel=0&vq=hd1080]
 
 == Installation ==
 
@@ -61,19 +63,79 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Screenshots ==
 
-1. WordPress / WooCommerce Plugin Settings. Just add API key.
-2. Receiptful's dashboard and mission control center.
-3. Customizing your Receiptful template.
-4. Add & activating upsells to be included in your receipts.
-5. Example of customer profile overview with rich meta data.
+1. Receipt comparison WooCommerce VS. Receiptful
+2. WordPress / WooCommerce Plugin Settings. Just add API key.
+3. Receiptful's dashboard and mission control center.
+4. Customizing your Receiptful template.
+5. Add & activating upsells to be included in your receipts.
+6. Example of customer profile overview with rich meta data.
 
 
 == Changelog ==
 
+= 1.1.5 - 20/05/2015 =
+
+* [Add] - Add recommendation options
+* [Add] - Page tracking
+* [Improvement] - Set out of stock products to hidden within Receiptful
+
+= 1.1.5 - 27/04/2015 =
+
+* [Fix] - WooCommerce 2.2.x compatibility notice with wc_tax_enabled()
+* [Improvement] - WPML won't break checkout
+* [Improvement] - Strip shortcodes from product descriptions
+* [Improvement] - Pass protected, draft, hidden, private products are now synced as hidden=true
+
+= 1.1.4 - 09/04/2015 =
+
+* [Add] - Product pageview tracking for personalised product recommendations
+* [Improvement] - Add Javascript defined checks
+* [Improvement] - Cleanup unused receipt api args
+* [Improvement] - Small refactor coupon creation
+
+= 1.1.3 - 01/04/2015 =
+
+* [Fix] - Typo in filter name 'receiptful_api_args_related_products'
+* [Improvement] - Prevent shipping coupons from having discount amounts
+* [Improvement] - Prevent getting related products in the initial product sync
+* [Improvement] - Automatically picking up Tax/totals translation from WooCommerce
+* [Improvement] - Prevent notice when API doesn't return the 'products' parameter
+
+= 1.1.2 - 12/03/2015 =
+
+* [Add] - Receipt sync for better recommendations
+* [Add] - Order note support
+* [Add] - Product note support
+* [Improvement] - Changed 'Shipping' to the actual shipping title
+* [Improvement] - Changed textdomain to 'receiptful' for consistancy
+* [Prevent] - Prevent notice in upcoming Receiptful update
+
+= 1.1.1 - 05/03/2015 =
+
+* [Add] - Product sync for better recommendations
+* [Fix] - load translation files
+* [Improvement] - Subtotals refactor
+* [Improvement] - CDN for JavaScript - Improving loading time
+* [Improvement] - Small queue improvements (don't add 400 response to queue)
+* [Improvement] - Subscriptions email notifications
+
+= 1.1.0 - 28/01/2015 =
+
+* [Add] - Unit tests!
+* [Add] - WooCommerce 2.3 support
+* [Add] - Filters & hooks for extending/modifying
+* [Add] - Receipt comparison screenshot, you should see it ;-)
+* [Improvement] - Payment method to the receipt
+* [Improvement] - Date parameter to the API call to keep order date/time equal
+* [Improvement] - Support for multiple download URLs
+* [Improvement] - Split up compatibility files in separate file
+* [Improvement] - Email class refactor
+
 = 1.0.5 - 14/01/2015 =
+
 * [Happy New Year!]
 * [Improvement] - Refactored email WC overrides
-* [Fix] - Warning when descriptions > 100 char
+* [Fix] - Warning when descriptions < 100 char
 
 = 1.0.4 - 18/12/2014 =
 
