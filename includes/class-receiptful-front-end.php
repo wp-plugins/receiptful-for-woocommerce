@@ -81,6 +81,8 @@ class Receiptful_Front_End {
 		$public_user_key 	= Receiptful()->api->get_public_user_key();
 		$product_id 		= 'product' == get_post_type( get_the_ID() ) ? get_the_ID() : null;
 		$customer 			= is_user_logged_in() ? get_current_user_id() : '';
+		$cart				= WC()->cart->get_cart();
+		$product_ids		= array_values( wp_list_pluck( $cart, 'product_id' ) );
 
 		// Bail if public user key is empty/invalid
 		if ( ! $public_user_key ) {
@@ -93,6 +95,7 @@ class Receiptful_Front_End {
 					Receiptful.init({
 						user: '<?php echo esc_js( $public_user_key ); ?>',
 						product: '<?php echo esc_js( $product_id ); ?>',
+						cart: '<?php echo esc_js( implode( ',', $product_ids ) ); ?>',
 						customer: '<?php echo esc_js( $customer ); ?>',
 						recommend: <?php echo 'yes' == get_option( 'receiptful_enable_recommendations', false ) ? true : false; ?>
 					});
