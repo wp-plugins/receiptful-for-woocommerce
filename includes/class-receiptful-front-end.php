@@ -97,7 +97,7 @@ class Receiptful_Front_End {
 						product: '<?php echo esc_js( $product_id ); ?>',
 						cart: '<?php echo esc_js( implode( ',', $product_ids ) ); ?>',
 						customer: '<?php echo esc_js( $customer ); ?>',
-						recommend: <?php echo 'yes' == get_option( 'receiptful_enable_recommendations', false ) ? true : false; ?>
+						recommend: <?php echo 'yes' == get_option( 'receiptful_enable_recommendations', false ) ? '1' : '0'; ?>
 					});
 				}
 			});

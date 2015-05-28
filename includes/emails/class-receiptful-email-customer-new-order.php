@@ -474,6 +474,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				),
 				'notes'				=> $order->customer_message,
 				'token'				=> $token,
+				'coupons'			=> $order->get_used_coupons(),
 			);
 
 			// Amount notes

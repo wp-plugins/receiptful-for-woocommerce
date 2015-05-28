@@ -5,7 +5,7 @@
  * Description: 	Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: 			Receiptful
  * Author URI: 		http://receiptful.com
- * Version: 		1.1.7
+ * Version: 		1.1.8
  * Text Domain: 	receiptful
  * Domain Path: 	/languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.7';
+	public $version = '1.1.8';
 
 
 	/**
@@ -198,10 +198,6 @@ class Receiptful_WooCommerce {
 		// Add tracking script
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		// Tracking calls
-		add_action( 'wp_footer', array( $this, 'print_scripts' ), 99 );
-
-
 		// Helper functions
 		add_action( 'plugins_loaded', array( $this, 'load_helper_functions' ) );
 
@@ -238,6 +234,10 @@ class Receiptful_WooCommerce {
 		// Add tracking script
 		wp_enqueue_script( 'receiptful-tracking', 'https://media.receiptful.com/scripts/tracking.js', array(), $this->version, false );
 
+		if ( isset( $_GET['redeem'] ) ) :
+			wp_enqueue_script( 'receiptful-redeem', 'https://media.receiptful.com/scripts/refer/redeem.js', array(), $this->version, false );
+		endif;
+
 	}
 
 
@@ -247,8 +247,11 @@ class Receiptful_WooCommerce {
 	 * Print initializing javascript.
 	 *
 	 * @since 1.0.2
+	 * @deprecated 1.1.8 Automatically set in receiptful.init().
 	 */
 	public function print_scripts() {
+
+		return _deprecated_function( __METHOD__, '1.1.8' );
 
 		if ( ! is_checkout() || ( is_checkout() && ! isset( $_GET['order-received'] ) ) ) {
 			?><script type='text/javascript'>
