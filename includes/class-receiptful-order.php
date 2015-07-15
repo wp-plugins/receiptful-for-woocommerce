@@ -21,7 +21,11 @@ class Receiptful_Order {
 	 */
 	public function __construct() {
 
+		// Save Receiptful user token on checkout
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'order_save_user_token' ), 10, 2 );
+
+		// Check product stock, if empty update product
+		add_action( 'woocommerce_reduce_order_stock', array( $this, 'maybe_update_products' ), 10, 1 );
 
 	}
 
@@ -45,5 +49,37 @@ class Receiptful_Order {
 		}
 
 	}
+
+
+	/**
+	 * Update products.
+	 *
+	 * Maybe send a update to Receiptful. Check if the product is out-of-stock,
+	 * when it is, a update will be send to Receiptful to make sure the product
+	 * is set to 'hidden'.
+	 *
+	 * @since 1.1.9
+	 *
+	 * @param	WC_Order $order Order object.
+	 */
+	public function maybe_update_products( $order ) {
+
+		foreach ( $order->get_items() as $item ) {
+
+			if ( $item['product_id'] > 0 ) {
+				$_product = $order->get_product_from_item( $item );
+
+				if ( $_product && $_product->exists() && $_product->managing_stock() ) {
+					if ( ! $_product->is_in_stock() ) {
+						Receiptful()->products->update_product( $_product->id );
+					}
+				}
+
+			}
+
+		}
+
+	}
+
 
 }

@@ -188,15 +188,17 @@ function receiptful_initial_receipt_sync() {
 		'post_type'			=> 'shop_order',
 		'post_status'		=> array_keys( wc_get_order_statuses() ),
 		'meta_query'		=> array(
+			'relation' => 'OR',
 			array(
 				'key'		=> '_receiptful_last_update',
 				'compare'	=> 'NOT EXISTS',
 				'value'		=> '',
 			),
+			// @since 1.1.9 - This is for a re-sync that should be initialised
 			array(
-				'key'		=> '_receiptful_receipt_id',
-				'compare'	=> 'NOT EXISTS',
-				'value'		=> '',
+				'key'		=> '_receiptful_last_update',
+				'compare'	=> '<',
+				'value'		=> strtotime( '2015-07-15' ),
 			),
 		),
 	) );
@@ -211,10 +213,10 @@ function receiptful_initial_receipt_sync() {
 	$args = array();
 	foreach ( $receipt_ids as $receipt_id ) {
 
-		$order				= wc_get_order( $receipt_id );
-		$items 				= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_items( $order );
-		$subtotals 			= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_subtotals( $order );
-		$order_args 		= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_order_args( $order, $items, $subtotals, $related_products = array() );
+		$order		= wc_get_order( $receipt_id );
+		$items 		= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_items( $order );
+		$subtotals 	= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_subtotals( $order );
+		$order_args	= WC()->mailer->emails['WC_Email_Customer_Completed_Order']->api_args_get_order_args( $order, $items, $subtotals, $related_products = array() );
 
 		$args[] = $order_args;
 

@@ -137,6 +137,11 @@ class Receiptful_Products {
 			return;
 		}
 
+		// Don't update auto drafts
+		if ( 'auto-draft' == get_post_status( $product_id ) ) {
+			return;
+		}
+
 		$product 	= wc_get_product( $product_id );
 		$images 	= $this->get_formatted_images( $product->id );
 		$categories	= $this->get_formatted_categories( $product->id );

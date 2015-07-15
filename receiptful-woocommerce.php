@@ -5,7 +5,7 @@
  * Description: 	Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: 			Receiptful
  * Author URI: 		http://receiptful.com
- * Version: 		1.1.8
+ * Version: 		1.1.9
  * Text Domain: 	receiptful
  * Domain Path: 	/languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.8';
+	public $version = '1.1.9';
 
 
 	/**
@@ -192,6 +192,9 @@ class Receiptful_WooCommerce {
 		// Add the plugin page Settings and Docs links
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'receiptful_plugin_links' ));
 
+		// Plugin updates
+		add_action( 'admin_init', array( $this, 'check_version' ), 2 );
+
 		// Plugin activation message
 		add_action( 'admin_notices', array( $this, 'plugin_activation' ) ) ;
 
@@ -334,11 +337,6 @@ class Receiptful_WooCommerce {
 
 		}
 
-		// Update version number if its not the same
-		if ( $this->version != get_option( 'receiptful_woocommerce_version' ) ) {
-			update_option( 'receiptful_woocommerce_version', $this->version );
-		}
-
 	}
 
 
@@ -357,6 +355,33 @@ class Receiptful_WooCommerce {
 		$links['settings'] = '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=receiptful' ) . '">' . __( 'Settings', 'receiptful' ) . '</a>';
 
 		return $links;
+
+	}
+
+
+	/**
+	 * Check plugin version.
+	 *
+	 * Check the current plugin version and see if there is any
+	 * data update required.
+	 *
+	 * @since 1.1.9
+	 */
+	public function check_version() {
+
+		/**
+		 * Version specific plugin updates
+		 */
+
+		// 1.1.9 - re-sync orders
+		if ( version_compare( $this->version, get_option( 'receiptful_woocommerce_version' ) ) ) {
+			delete_option( 'receiptful_completed_initial_receipt_sync' );
+		}
+
+		// Update version number if its not the same
+		if ( $this->version != get_option( 'receiptful_woocommerce_version' ) ) {
+			update_option( 'receiptful_woocommerce_version', $this->version );
+		}
 
 	}
 

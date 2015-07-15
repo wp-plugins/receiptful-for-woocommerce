@@ -34,9 +34,42 @@ class Receiptful_Recommendations {
 	 *
 	 * @since 1.1.6
 	 */
-	public function get_recommendations() {
+	public function get_recommendations( $args = array() ) {
 
-		return '<div class="rf-recommendations"></div>';
+		$args = wp_parse_args( $args, array(
+			'name'		  			=> null,
+			'show_header' 			=> null,
+			'header_text' 			=> null,
+			'header_type' 			=> null,
+			'show_title'  			=> null,
+			'show_price'  			=> null,
+			'price_format'			=> null,
+			'number_of_products'	=> null,
+			'styles'				=> null,
+		) );
+
+		if ( false == $args['show_title'] || 0 == $args['show_title'] ) :
+			$args['show_title'] = '';
+		endif;
+
+		if ( false == $args['show_price'] || 0 == $args['show_price'] ) :
+			$args['show_price'] = '';
+		endif;
+
+		if ( false == $args['show_header'] || 0 == $args['show_header'] ) :
+			$args['show_header'] = '';
+		endif;
+
+		// Sanitize & format custom attributes
+		$attributes = array();
+		foreach ( $args as $k => $v ) :
+			if ( ! is_null( $v ) ) :
+				$attributes[] = 'data-' . esc_attr( str_replace( '_', '-', $k ) ) . '="' . esc_attr( $v ) . '"';
+			endif;
+		endforeach;
+		$attributes = implode( ' ', $attributes );
+
+		return '<div class="rf-recommendations" ' . $attributes . '></div>';
 
 	}
 
@@ -48,9 +81,9 @@ class Receiptful_Recommendations {
 	 *
 	 * @since 1.1.6
 	 */
-	public function display_recommendations() {
+	public function display_recommendations( $args = array() ) {
 
-		echo $this->get_recommendations();
+		echo $this->get_recommendations( $args = array() );
 
 	}
 
@@ -62,9 +95,21 @@ class Receiptful_Recommendations {
 	 *
 	 * @since 1.1.6
 	 */
-	public function recommendation_shortcode() {
+	public function recommendation_shortcode( $atts = array() ) {
 
-		return $this->get_recommendations();
+		$args = shortcode_atts( array(
+			'name'		  			=> null,
+			'show_header' 			=> null,
+			'header_text' 			=> null,
+			'header_type' 			=> null,
+			'show_title'  			=> null,
+			'show_price'  			=> null,
+			'price_format'			=> null,
+			'number_of_products'	=> null,
+			'styles'				=> null,
+		), $atts );
+
+		return $this->get_recommendations( $args );
 
 	}
 

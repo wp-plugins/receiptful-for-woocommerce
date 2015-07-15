@@ -138,6 +138,9 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 			}
 
+			// Set time when receipt was send
+			update_post_meta( $order->id, '_receiptful_last_update', time() );
+
 			do_action( 'receiptful_after_mail_send', $order->id, $response );
 
 			return $response;
@@ -266,6 +269,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 
 				}
 
+				// Product notes
 				if ( $purchase_note = get_post_meta( $item['product_id'], '_purchase_note', true ) ) {
 					$meta_data[] = array(
 						'key'	=> __( 'Note', 'woocommerce' ),
@@ -273,6 +277,15 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 					);
 				}
 
+				// Product image
+				$product_id = $item['variation_id'] > 0 ? $item['variation_id'] : $item['product_id'];
+				if ( has_post_thumbnail( $product_id ) ) {
+					list( $img_src, $width, $height ) = wp_get_attachment_image_src( get_post_thumbnail_id( $product_id ), 'shop_thumbnail' );
+				} elseif ( ( $parent_id = wp_get_post_parent_id( $product_id ) ) && has_post_thumbnail( $parent_id ) ) {
+					list( $img_src, $width, $height ) = wp_get_attachment_image_src( get_post_thumbnail_id( $parent_id ), 'shop_thumbnail' );
+				} else {
+					$img_src = wc_placeholder_img_src( 'shop_thumbnail' );
+				}
 
 				$inc_tax 		= 'incl' == $order->tax_display_cart ? true : false;
 				$product_amount = $order->get_line_subtotal( $item, $inc_tax, false ) / $item['qty'];
@@ -284,6 +297,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 					'amount'		=> number_format( (float) $product_amount, 2, '.', '' ),
 					'downloadUrls'	=> $this->maybe_get_download_urls( $item, $order->id ),
 					'metas'			=> $meta_data,
+					'image'			=> $img_src,
 				);
 
 			}
