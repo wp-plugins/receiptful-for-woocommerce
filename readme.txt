@@ -77,7 +77,7 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 * [Add] - Product image to the API call, allow to show the product image on the receipt.
 * [Improvement] - Update products to not be recommended when going out of stock.
-* [Improvement] - Allow custom shortcode attributes (read more; https://app.receiptful.com/recommendations/instructions).
+* [Improvement] - Allow custom shortcode attributes. read more; https://app.receiptful.com/recommendations/instructions.
 * [Add] - Re-sync all orders to improve our data.
 
 = 1.1.8 -28/05/2015 =
