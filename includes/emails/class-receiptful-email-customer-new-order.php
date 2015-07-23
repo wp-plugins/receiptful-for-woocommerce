@@ -280,9 +280,9 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				// Product image
 				$product_id = $item['variation_id'] > 0 ? $item['variation_id'] : $item['product_id'];
 				if ( has_post_thumbnail( $product_id ) ) {
-					list( $img_src, $width, $height ) = wp_get_attachment_image_src( get_post_thumbnail_id( $product_id ), 'shop_thumbnail' );
+					list( $img_src, $width, $height ) = wp_get_attachment_image_src( get_post_thumbnail_id( $product_id ), array( 90, 900 ) );
 				} elseif ( ( $parent_id = wp_get_post_parent_id( $product_id ) ) && has_post_thumbnail( $parent_id ) ) {
-					list( $img_src, $width, $height ) = wp_get_attachment_image_src( get_post_thumbnail_id( $parent_id ), 'shop_thumbnail' );
+					list( $img_src, $width, $height ) = wp_get_attachment_image_src( get_post_thumbnail_id( $parent_id ), array( 90, 900 ) );
 				} else {
 					$img_src = wc_placeholder_img_src( 'shop_thumbnail' );
 				}

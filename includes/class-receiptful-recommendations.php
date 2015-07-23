@@ -48,15 +48,15 @@ class Receiptful_Recommendations {
 			'styles'				=> null,
 		) );
 
-		if ( false == $args['show_title'] || 0 == $args['show_title'] ) :
+		if ( 'false' == $args['show_title'] || '0' == $args['show_title'] ) :
 			$args['show_title'] = '';
 		endif;
 
-		if ( false == $args['show_price'] || 0 == $args['show_price'] ) :
+		if ( 'false' == $args['show_price'] || '0' == $args['show_price'] ) :
 			$args['show_price'] = '';
 		endif;
 
-		if ( false == $args['show_header'] || 0 == $args['show_header'] ) :
+		if ( 'false' == $args['show_header'] || '0' == $args['show_header'] ) :
 			$args['show_header'] = '';
 		endif;
 
