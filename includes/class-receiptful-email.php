@@ -154,7 +154,8 @@ class Receiptful_Email {
 			return $coupon_found;
 		}
 
-		$expiry_date = date_i18n( 'Y-m-d', strtotime( '+' . wc_clean( $data['expiryPeriod'] ) . ' day' ) );
+		$expiry_days = absint( $data['expiryPeriod'] ) + 1;
+		$expiry_date = date_i18n( 'Y-m-d', strtotime( '+' . $expiry_days . ' day' ) );
 
 		if ( 'discountcoupon' == $data['upsellType'] ) {
 

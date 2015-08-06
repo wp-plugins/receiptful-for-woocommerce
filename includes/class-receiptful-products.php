@@ -30,6 +30,9 @@ class Receiptful_Products {
 		// Trash product
 		add_action( 'trash_product', array( $this, 'delete_product' ), 10, 2 );
 
+		// Update product on sale price start/expire
+		add_action( 'woocommerce_scheduled_sales', array( $this, 'update_product_sale_change' ) );
+
 	}
 
 
@@ -356,6 +359,59 @@ class Receiptful_Products {
 		}
 
 		update_option( '_receiptful_queue', $queue );
+
+	}
+
+
+	/**
+	 * Update on sale change.
+	 *
+	 * Send a product update to Receiptful when a product goes
+	 * into or out of a sale period (automatically via a event).
+	 *
+	 * @since 1.1.11
+	 */
+	function update_product_sale_change() {
+
+		global $wpdb;
+
+		// Sales which are due to start
+		$product_ids = $wpdb->get_col( $wpdb->prepare( "
+			SELECT postmeta.post_id FROM {$wpdb->postmeta} as postmeta
+			LEFT JOIN {$wpdb->postmeta} as postmeta_2 ON postmeta.post_id = postmeta_2.post_id
+			LEFT JOIN {$wpdb->postmeta} as postmeta_3 ON postmeta.post_id = postmeta_3.post_id
+			WHERE postmeta.meta_key = '_sale_price_dates_from'
+			AND postmeta_2.meta_key = '_price'
+			AND postmeta_3.meta_key = '_sale_price'
+			AND postmeta.meta_value > 0
+			AND postmeta.meta_value < %s
+			AND postmeta_2.meta_value != postmeta_3.meta_value
+		", current_time( 'timestamp' ) ) );
+
+		if ( $product_ids ) {
+			foreach ( $product_ids as $product_id ) {
+				$this->update_product( $product_id );
+			}
+		}
+
+		// Sales which are due to end
+		$product_ids = $wpdb->get_col( $wpdb->prepare( "
+			SELECT postmeta.post_id FROM {$wpdb->postmeta} as postmeta
+			LEFT JOIN {$wpdb->postmeta} as postmeta_2 ON postmeta.post_id = postmeta_2.post_id
+			LEFT JOIN {$wpdb->postmeta} as postmeta_3 ON postmeta.post_id = postmeta_3.post_id
+			WHERE postmeta.meta_key = '_sale_price_dates_to'
+			AND postmeta_2.meta_key = '_price'
+			AND postmeta_3.meta_key = '_regular_price'
+			AND postmeta.meta_value > 0
+			AND postmeta.meta_value < %s
+			AND postmeta_2.meta_value != postmeta_3.meta_value
+		", current_time( 'timestamp' ) ) );
+
+		if ( $product_ids ) {
+			foreach ( $product_ids as $product_id ) {
+				$this->update_product( $product_id );
+			}
+		}
 
 	}
 

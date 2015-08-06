@@ -5,7 +5,7 @@
  * Description: 	Receiptful replaces and supercharges the default WooCommerce receipts. Just activate, add API and be awesome.
  * Author: 			Receiptful
  * Author URI: 		http://receiptful.com
- * Version: 		1.1.10
+ * Version: 		1.1.11
  * Text Domain: 	receiptful
  * Domain Path: 	/languages/
  *
@@ -35,7 +35,7 @@ class Receiptful_WooCommerce {
 	 * @since 1.0.1
 	 * @var string $version Plugin version number.
 	 */
-	public $version = '1.1.10';
+	public $version = '1.1.11';
 
 
 	/**
@@ -253,19 +253,7 @@ class Receiptful_WooCommerce {
 	 * @deprecated 1.1.8 Automatically set in receiptful.init().
 	 */
 	public function print_scripts() {
-
 		return _deprecated_function( __METHOD__, '1.1.8' );
-
-		if ( ! is_checkout() || ( is_checkout() && ! isset( $_GET['order-received'] ) ) ) {
-			?><script type='text/javascript'>
-				document.addEventListener('DOMContentLoaded', function(event) {
-					if ( typeof Receiptful !== 'undefined' ) {
-						Receiptful.setTrackingCookie();
-					}
-				});
-			</script><?php
-		}
-
 	}
 
 
@@ -280,37 +268,7 @@ class Receiptful_WooCommerce {
 	 * @param int $order_id ID of the order being completed.
 	 */
 	public function thank_you_tracking( $order_id ) {
-
 		return _deprecated_function( __METHOD__, '1.1.6' );
-
-		$order					= wc_get_order( $order_id );
-		$coupon_tracking_code	= '';
-
-		// Register the usage of Receiptful coupons
-		foreach ( $order->get_used_coupons() as $coupon ) {
-
-			$coupon_id					= wc_get_coupon_by_code( $coupon );
-			$is_receiptful_coupon		= get_post_meta( $coupon_id, 'receiptful_coupon', true );
-			$coupon_code				= esc_js( strtoupper( $coupon ) );
-
-			if ( 'yes' == $is_receiptful_coupon ) {
-				$coupon_tracking_code = "Receiptful.conversion.couponCode = '$coupon_code';";
-			}
-
-		}
-
-		?><script type='text/javascript'>
-			document.addEventListener('DOMContentLoaded', function(event) {
-				if ( typeof Receiptful !== 'undefined' ) {
-					Receiptful.conversion.reference = '<?php echo esc_js( ltrim( $order->get_order_number(), _x( '#', 'hash before order number', 'receiptful' ) ) ); ?>';
-					Receiptful.conversion.amount	= <?php echo esc_js( $order->get_total() ); ?>;
-					Receiptful.conversion.currency	= '<?php echo esc_js( $order->get_order_currency() ); ?>';
-					<?php echo $coupon_tracking_code; ?>
-					Receiptful.trackConversion();
-				}
-			});
-		</script><?php
-
 	}
 
 
@@ -374,7 +332,7 @@ class Receiptful_WooCommerce {
 		 */
 
 		// 1.1.9 - re-sync orders
-		if ( version_compare( $this->version, get_option( 'receiptful_woocommerce_version' ) ) ) {
+		if ( version_compare( get_option( 'receiptful_woocommerce_version' ), '1.1.9', '<' ) ) {
 			delete_option( 'receiptful_completed_initial_receipt_sync' );
 		}
 

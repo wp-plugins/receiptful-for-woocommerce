@@ -273,7 +273,7 @@ if ( ! class_exists( 'Receiptful_Email_Customer_New_Order' ) ) {
 				if ( $purchase_note = get_post_meta( $item['product_id'], '_purchase_note', true ) ) {
 					$meta_data[] = array(
 						'key'	=> __( 'Note', 'woocommerce' ),
-						'value'	=> $purchase_note,
+						'value'	=> wp_kses_post( $purchase_note ),
 					);
 				}
 

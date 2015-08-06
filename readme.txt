@@ -1,9 +1,9 @@
 === Receiptful for WooCommerce ===
 Contributors: receiptful
 Tags: receiptful, receiptful woocommerce, receipt, receipts, invoice, email, order confirmation, order mail, ecommerce mail
-Requires at least: 3.6.0
-Tested up to: 4.2
-Stable tag: 1.1.10
+Requires at least: 3.7.0
+Tested up to: 4.3
+Stable tag: 1.1.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,13 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 
 == Changelog ==
+
+= 1.1.11 - 06/08/2015 =
+
+* [Improvement] - Coupon expiry is now always will end of day that is promoted on the receipt
+* [Improvement] - Update product when scheduled sale price starts/ends
+* [Improvement] - Allow some HTML in product note field
+* [Fix] - No longer initiate order sync on every update
 
 = 1.1.10 - 21/07/2015 =
 
