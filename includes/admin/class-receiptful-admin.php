@@ -72,6 +72,10 @@ class Receiptful_Admin {
 		// Remove public key when API key gets changed (will be gotten automatically)
 		add_action( 'update_option_receiptful_api_key', array( $this, 'delete_public_key' ), 10, 2 );
 
+		// Add debug tool
+		add_filter( 'woocommerce_debug_tools', array( $this, 'receiptful_status_tools' ) );
+		add_action( 'admin_init', array( $this, 'process_receiptful_status_tools' ) );
+
 	}
 
 
@@ -189,6 +193,61 @@ class Receiptful_Admin {
 	public function delete_public_key( $old_value, $value ) {
 
 		delete_option( 'receiptful_public_user_key' );
+
+	}
+
+
+	/**
+	 * Add product re-sync tool.
+	 *
+	 * Add a product re-sync tool to the System -> tools page to
+	 * re-sync all products with Receiptful.
+	 *
+	 * @since 1.1.12
+	 *
+	 * @param	array	$tools	List of existing tools.
+	 * @param	array			List of modified tools.
+	 */
+	public function receiptful_status_tools( $tools ) {
+
+		$tools['receiptful_product_sync'] = array(
+			'name'		=> __( 'Synchronize products with Receiptful', 'receiptful' ),
+			'button'	=> __( 'Synchronize', 'receipfult' ),
+			'desc'		=> __( 'This will update all products in Receiptful with all its latest data', 'receiptful' ),
+		);
+
+		return $tools;
+
+	}
+
+
+	/**
+	 * Process re-sync action.
+	 *
+	 * Make sure that the status tool 'Receiptful re-sync' is working.
+	 *
+	 * @since 1.1.12
+	 */
+	public function process_receiptful_status_tools() {
+
+		if ( ! empty( $_GET['action'] ) && 'receiptful_product_sync' == $_GET['action'] && ! empty( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'debug_action' ) ) {
+
+			// Get all product IDs
+			$product_ids = get_posts( array(
+				'fields'			=> 'ids',
+				'posts_per_page'	=> -1,
+				'post_type'			=> 'product',
+				'post_status'		=> 'any',
+			) );
+			$product_ids = array_map( 'absint', $product_ids );
+
+			$queue = get_option( '_receiptful_queue', array() );
+			foreach ( $product_ids as $product_id ) {
+				$queue['products'][ $product_id ] = array( 'id' => $product_id, 'action' => 'update' );
+			}
+			update_option( '_receiptful_queue', $queue );
+
+		}
 
 	}
 

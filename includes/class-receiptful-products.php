@@ -31,7 +31,7 @@ class Receiptful_Products {
 		add_action( 'trash_product', array( $this, 'delete_product' ), 10, 2 );
 
 		// Update product on sale price start/expire
-		add_action( 'woocommerce_scheduled_sales', array( $this, 'update_product_sale_change' ) );
+		add_action( 'woocommerce_scheduled_sales', array( $this, 'update_product_sale_change' ), 9 );
 
 	}
 
@@ -337,13 +337,15 @@ class Receiptful_Products {
 	 * Process the producs that are in the queue.
 	 *
 	 * @since 1.1.1
+	 * @since 1.1.12 - Limit queue processing to 225 products per batch
 	 */
 	public function process_queue() {
 
 		$queue = get_option( '_receiptful_queue', array() );
 
+		// Process products
 		if ( isset( $queue['products'] ) && is_array( $queue['products'] ) ) {
-			foreach ( $queue['products'] as $key => $product ) {
+			foreach ( array_slice( $queue['products'], 0, 225, true ) as $key => $product ) {
 
 				if ( 'delete' == $product['action'] ) {
 					$response = $this->delete_product( $product['id'] );
@@ -376,7 +378,7 @@ class Receiptful_Products {
 		global $wpdb;
 
 		// Sales which are due to start
-		$product_ids = $wpdb->get_col( $wpdb->prepare( "
+		$start_sale_product_ids = $wpdb->get_col( $wpdb->prepare( "
 			SELECT postmeta.post_id FROM {$wpdb->postmeta} as postmeta
 			LEFT JOIN {$wpdb->postmeta} as postmeta_2 ON postmeta.post_id = postmeta_2.post_id
 			LEFT JOIN {$wpdb->postmeta} as postmeta_3 ON postmeta.post_id = postmeta_3.post_id
@@ -388,14 +390,8 @@ class Receiptful_Products {
 			AND postmeta_2.meta_value != postmeta_3.meta_value
 		", current_time( 'timestamp' ) ) );
 
-		if ( $product_ids ) {
-			foreach ( $product_ids as $product_id ) {
-				$this->update_product( $product_id );
-			}
-		}
-
 		// Sales which are due to end
-		$product_ids = $wpdb->get_col( $wpdb->prepare( "
+		$end_sale_product_ids = $wpdb->get_col( $wpdb->prepare( "
 			SELECT postmeta.post_id FROM {$wpdb->postmeta} as postmeta
 			LEFT JOIN {$wpdb->postmeta} as postmeta_2 ON postmeta.post_id = postmeta_2.post_id
 			LEFT JOIN {$wpdb->postmeta} as postmeta_3 ON postmeta.post_id = postmeta_3.post_id
@@ -407,8 +403,19 @@ class Receiptful_Products {
 			AND postmeta_2.meta_value != postmeta_3.meta_value
 		", current_time( 'timestamp' ) ) );
 
-		if ( $product_ids ) {
-			foreach ( $product_ids as $product_id ) {
+		// Process the WooCommerce function manually
+		if ( function_exists( 'woocommerce_scheduled_sales' ) ) {
+			woocommerce_scheduled_sales();
+		}
+
+		if ( $start_sale_product_ids ) {
+			foreach ( $start_sale_product_ids as $product_id ) {
+				$this->update_product( $product_id );
+			}
+		}
+
+		if ( $end_sale_product_ids ) {
+			foreach ( $end_sale_product_ids as $product_id ) {
 				$this->update_product( $product_id );
 			}
 		}
