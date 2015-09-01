@@ -73,6 +73,11 @@ Yes, Receiptful works with any theme - whether free, commercial or custom. You d
 
 == Changelog ==
 
+= 1.1.12 - 01/09/2015 =
+
+* [Improvement] - Update products on sale price start/expiry (accuracity)
+* [Add] - 'Synchronize products' feature in the WooCommerce -> System -> Tools area
+
 = 1.1.11 - 06/08/2015 =
 
 * [Improvement] - Coupon expiry is now always will end of day that is promoted on the receipt
